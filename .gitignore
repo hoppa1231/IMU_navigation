@@ -1,0 +1,25 @@
+# Python/runtime
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environments
+.venv/
+venv/
+env/
+
+# Notebook/editor noise
+.ipynb_checkpoints/
+.idea/
+.vscode/
+
+# Local source data and generated artifacts.
+# See docs/data_layout.md for the data policy.
+/artifacts/
+/derived/
+
+# Generated reports that are useful locally but should be regenerated, not versioned.
+/reports/poli_na_rollout_seq100.md
