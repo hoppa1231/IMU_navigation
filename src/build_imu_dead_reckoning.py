@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=Path, default=Path("derived/dataflash"))
     parser.add_argument("--out-csv", type=Path, default=Path("derived/predictions/imu_dead_reckoning/dataflash_imu_dr.csv"))
-    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/imu_dead_reckoning/index.html"))
+    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/navigation/imu_dead_reckoning/index.html"))
     parser.add_argument("--report", type=Path, default=Path("reports/imu_dead_reckoning.md"))
     parser.add_argument(
         "--calibration-s",

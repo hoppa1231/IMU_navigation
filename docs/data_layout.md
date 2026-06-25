@@ -36,6 +36,18 @@ Git:
 viewers, maps, and replay pages. Rebuild it from scripts when needed instead
 of committing generated output.
 
+Current generated output groups:
+
+| path | role |
+| --- | --- |
+| `artifacts/generated/gps/flights/` | GPS maps, replay pages, SVG tracks, GeoJSON, and the flight viewer. |
+| `artifacts/generated/navigation/` | GPS-vs-rollout overlays for trajectory, IMU, optical-flow, and POLI_NA experiments. |
+| `artifacts/generated/dataflash/predictions/` | DataFlash prediction viewers for sweep, rolling, and sequence variants. |
+| `artifacts/generated/dataflash/rollouts/` | DataFlash open-loop rollout viewers. |
+| `artifacts/generated/dataflash/final_report/` | Final-report generated DataFlash visuals. |
+| `artifacts/generated/diagnostics/` | Exploratory diagnostic plots and pages. |
+| `artifacts/generated/legacy/` | Old first-pass generated outputs kept only for comparison. |
+
 Useful viewers:
 
 - `python3 src/gps_flight_map.py`
@@ -68,3 +80,5 @@ Do not commit:
 If a file is required to reproduce a result but is too large or external, keep
 it under `artifacts/` and document it here. If a file can be recreated from a
 script, keep it under `derived/` or `artifacts/generated/`.
+
+See also `docs/generated_layout.md` and `docs/cleanup_candidates.md`.

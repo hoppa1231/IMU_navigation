@@ -82,7 +82,7 @@ def parse_args() -> argparse.Namespace:
         help="Also use segmented flights from combined artifacts/data.csv. Off by default because it contains multiple flights.",
     )
     parser.add_argument("--out-csv", type=Path, default=Path("derived/predictions/flow_dead_reckoning/flow_dr.csv"))
-    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/flow_dead_reckoning/index.html"))
+    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/navigation/flow_dead_reckoning/index.html"))
     parser.add_argument("--report", type=Path, default=Path("reports/flow_dead_reckoning.md"))
     parser.add_argument("--max-html-points", type=int, default=4000)
     return parser.parse_args()

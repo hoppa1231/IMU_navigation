@@ -30,8 +30,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--flight-index", type=Path, default=Path("derived/datasets/flight_index.csv"))
     parser.add_argument("--tracks-dir", type=Path, default=Path("derived/datasets/tracks"))
-    parser.add_argument("--visual-dir", type=Path, default=Path("artifacts/generated/gps_flights"))
-    parser.add_argument("--viewer-html", type=Path, default=Path("artifacts/generated/gps_flights/index.html"))
+    parser.add_argument("--visual-dir", type=Path, default=Path("artifacts/generated/gps/flights"))
+    parser.add_argument("--viewer-html", type=Path, default=Path("artifacts/generated/gps/flights/index.html"))
     parser.add_argument("--report", type=Path, default=Path("reports/flight_tracks.md"))
     parser.add_argument("--min-status", type=float, default=3.0)
     parser.add_argument("--max-hdop", type=float, default=None)
@@ -150,9 +150,9 @@ def write_report(path: Path, rows: list[dict[str, object]]) -> None:
         "Generated outputs:",
         "",
         "- `derived/datasets/tracks/{flight_id}_track.csv` - local ENU GPS trajectory in meters.",
-        "- `artifacts/generated/gps_flights/{flight_id}/map.html` - map for the same `flight_id`.",
-        "- `artifacts/generated/gps_flights/{flight_id}/simulation.html` - replay for the same `flight_id`.",
-        "- `artifacts/generated/gps_flights/index.html` - one-page track selector and viewer.",
+        "- `artifacts/generated/gps/flights/{flight_id}/map.html` - map for the same `flight_id`.",
+        "- `artifacts/generated/gps/flights/{flight_id}/simulation.html` - replay for the same `flight_id`.",
+        "- `artifacts/generated/gps/flights/index.html` - one-page track selector and viewer.",
         "",
         "Original telemetry files are not modified.",
         "",

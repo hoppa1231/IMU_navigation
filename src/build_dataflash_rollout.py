@@ -20,7 +20,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--report", type=Path, default=Path("reports/experiments/dataflash_rollout_imu_att_h5000.md"))
     parser.add_argument("--rollout-csv", type=Path, default=Path("derived/predictions/dataflash_rollout/imu_att_h5000_l5000_rollout.csv"))
-    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/dataflash_rollout/index.html"))
+    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/dataflash/rollouts/ridge/index.html"))
     return parser.parse_args()
 
 

@@ -13,7 +13,7 @@ from pathlib import Path
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pred-dir", type=Path, default=Path("derived/predictions/dataflash_sweep"))
-    parser.add_argument("--output", type=Path, default=Path("artifacts/generated/dataflash_predictions/index.html"))
+    parser.add_argument("--output", type=Path, default=Path("artifacts/generated/dataflash/predictions/sweep/index.html"))
     parser.add_argument("--max-points", type=int, default=1500)
     return parser.parse_args()
 

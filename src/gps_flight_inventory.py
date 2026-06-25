@@ -70,7 +70,7 @@ def main() -> None:
     lines.extend(
         [
             "",
-            "Generated files are written under `artifacts/generated/`.",
+            "Generated files are written under grouped subdirectories in `artifacts/generated/`.",
             "",
             "## Continuous tracks",
             "",

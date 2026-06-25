@@ -40,7 +40,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--tracks-dir", type=Path, default=Path("derived/datasets/tracks"))
     parser.add_argument("--rollout-csv", type=Path, default=Path("derived/predictions/trajectory_overlay/rollout.csv"))
-    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/trajectory_overlay/index.html"))
+    parser.add_argument("--html", type=Path, default=Path("artifacts/generated/navigation/trajectory_overlay/index.html"))
     parser.add_argument("--report", type=Path, default=Path("reports/trajectory_overlay.md"))
     parser.add_argument("--max-track-points", type=int, default=2500)
     parser.add_argument(

@@ -965,7 +965,7 @@ SIMULATION_TEMPLATE = """<!doctype html>
 
 def resolve_outputs(args: argparse.Namespace, segment_index: int | None = None) -> dict[str, Path]:
     source_name = args.name or args.gps.stem
-    out_dir = args.out_dir or Path("artifacts/generated/gps_flights") / slugify(source_name)
+    out_dir = args.out_dir or Path("artifacts/generated/gps/flights") / slugify(source_name)
     if segment_index is not None:
         out_dir = out_dir / f"segment_{segment_index:02d}"
     return {

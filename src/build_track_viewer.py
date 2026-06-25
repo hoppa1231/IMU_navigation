@@ -18,8 +18,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--flight-index", type=Path, default=Path("derived/datasets/flight_index.csv"))
     parser.add_argument("--tracks-dir", type=Path, default=Path("derived/datasets/tracks"))
-    parser.add_argument("--visual-dir", type=Path, default=Path("artifacts/generated/gps_flights"))
-    parser.add_argument("--out-html", type=Path, default=Path("artifacts/generated/gps_flights/index.html"))
+    parser.add_argument("--visual-dir", type=Path, default=Path("artifacts/generated/gps/flights"))
+    parser.add_argument("--out-html", type=Path, default=Path("artifacts/generated/gps/flights/index.html"))
     return parser.parse_args()
 
 

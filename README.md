@@ -100,7 +100,7 @@ python3 src/dataflash_extract.py \
 python3 src/gps_flight_map.py
 ```
 
-По умолчанию скрипт читает `derived/dataflash/GPS.csv` и пишет производные файлы в `artifacts/generated/gps_flights/GPS/`.
+По умолчанию скрипт читает `derived/dataflash/GPS.csv` и пишет производные файлы в `artifacts/generated/gps/flights/GPS/`.
 
 Для отдельного источника:
 
@@ -156,9 +156,9 @@ python3 src/prepare_flight_tracks.py
 Результаты:
 
 - `derived/datasets/tracks/{flight_id}_track.csv` - `time_s`, `source_time_s`, `lat/lon/alt`, `east/north/up`, скорость и накопленная дистанция;
-- `artifacts/generated/gps_flights/index.html` - единая страница выбора и просмотра треков;
-- `artifacts/generated/gps_flights/{flight_id}/map.html`;
-- `artifacts/generated/gps_flights/{flight_id}/simulation.html`;
+- `artifacts/generated/gps/flights/index.html` - единая страница выбора и просмотра треков;
+- `artifacts/generated/gps/flights/{flight_id}/map.html`;
+- `artifacts/generated/gps/flights/{flight_id}/simulation.html`;
 - `reports/flight_tracks.md`.
 
 Важно: GPS-координаты в `track.csv` остаются эталоном/target, а не входными признаками для навигации без GNSS.
@@ -239,7 +239,7 @@ python3 src/build_trajectory_overlay.py
 
 Результаты:
 
-- `artifacts/generated/trajectory_overlay/index.html` - интерактивное наложение GPS и накопленной IMU/flow-траектории;
+- `artifacts/generated/navigation/trajectory_overlay/index.html` - интерактивное наложение GPS и накопленной IMU/flow-траектории;
 - `derived/predictions/trajectory_overlay/rollout.csv` - точки rollout и ошибки;
 - `reports/trajectory_overlay.md` - итоговые метрики drift/error.
 
@@ -255,7 +255,7 @@ python3 src/build_imu_dead_reckoning.py
 
 Результаты:
 
-- `artifacts/generated/imu_dead_reckoning/index.html` - наложение GPS/POS и чистой IMU-траектории;
+- `artifacts/generated/navigation/imu_dead_reckoning/index.html` - наложение GPS/POS и чистой IMU-траектории;
 - `derived/predictions/imu_dead_reckoning/dataflash_imu_dr.csv` - точки, скорости, ускорения и ошибки;
 - `reports/imu_dead_reckoning.md` - финальная ошибка и интерпретация.
 
@@ -277,7 +277,7 @@ python3 src/build_flow_dead_reckoning.py --include-combined-data
 
 Результаты:
 
-- `artifacts/generated/flow_dead_reckoning/index.html` - наложение реальной GPS-траектории и расчетной flow/IMU-траектории;
+- `artifacts/generated/navigation/flow_dead_reckoning/index.html` - наложение реальной GPS-траектории и расчетной flow/IMU-траектории;
 - `derived/predictions/flow_dead_reckoning/flow_dr.csv` - точки траекторий, скорости и ошибки;
 - `reports/flow_dead_reckoning.md` - итоговые метрики.
 
@@ -293,7 +293,7 @@ PYTHONPATH=/tmp/poli_deps python3 src/run_poli_na_rollout.py
 
 Результаты:
 
-- `artifacts/generated/poli_na_rollout/index.html` - наложение реальной GPS и POLI_NA rollout;
+- `artifacts/generated/navigation/poli_na_rollout/index.html` - наложение реальной GPS и POLI_NA rollout;
 - `derived/predictions/poli_na_rollout/poli_na_rollout.csv` - точки rollout;
 - `reports/poli_na_rollout.md` - метрики по пресетам.
 
@@ -389,7 +389,7 @@ python3 src/build_dataflash_prediction_viewer.py
 
 - `reports/experiments/dataflash_sweep.md`;
 - `derived/predictions/dataflash_sweep/.../*_pred.csv`;
-- `artifacts/generated/dataflash_predictions/index.html`.
+- `artifacts/generated/dataflash/predictions/sweep/index.html`.
 
 Новый вывод: при split `60/20/20` и подборе `alpha` на validation устойчивее всего выглядит `imu_att`. Набор `all` с моторными/питающими признаками чувствителен к регуляризации: validation может выбрать слишком слабую регуляризацию, а test при этом ухудшается. Это не отменяет пользу моторов из старого `80/20` baseline, но показывает, что следующий шаг должен проверять устойчивость по временным участкам, а не только одну точку split.
 
@@ -399,7 +399,7 @@ python3 src/build_dataflash_prediction_viewer.py
 python3 src/run_dataflash_rolling_validation.py
 python3 src/build_dataflash_prediction_viewer.py \
   --pred-dir derived/predictions/dataflash_rolling_validation \
-  --output artifacts/generated/dataflash_rolling_predictions/index.html
+  --output artifacts/generated/dataflash/predictions/rolling/index.html
 python3 src/build_dataflash_rollout.py
 ```
 
@@ -407,8 +407,8 @@ python3 src/build_dataflash_rollout.py
 
 - `reports/experiments/dataflash_rolling_validation.md`;
 - `reports/experiments/dataflash_rollout_summary.md`;
-- `artifacts/generated/dataflash_rolling_predictions/index.html`;
-- `artifacts/generated/dataflash_rollout/index.html`.
+- `artifacts/generated/dataflash/predictions/rolling/index.html`;
+- `artifacts/generated/dataflash/rollouts/ridge/index.html`.
 
 Rolling validation подтвердил: по оконным метрикам лучший устойчивый кандидат сейчас `imu_att h5000_l5000 ridge` (`MAE 3D 16.293` против `zero 16.335`, но лучше RMSE/P95). Sparse rollout показал, что этого недостаточно: ridge лучше на folds 1 и 3, но резко проваливается на fold 2. Следующий критерий для моделей - не только ошибка `dx/dy/dz`, но и drift/rollout.
 
@@ -426,8 +426,8 @@ python3 src/run_dataflash_sequence_baseline.py \
 
 - `reports/experiments/dataflash_sequence_imu_att_h5000.md`;
 - `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100.md`;
-- `artifacts/generated/dataflash_sequence_fixed100_predictions/index.html`;
-- `artifacts/generated/dataflash_rollout_sequence_fixed100/index.html`.
+- `artifacts/generated/dataflash/predictions/sequence_fixed100/index.html`;
+- `artifacts/generated/dataflash/rollouts/sequence_fixed100/index.html`.
 
 Вывод: sequence с per-fold выбором `alpha` нестабилен. Sequence с фиксированным `alpha=100`, выбранным по mean rolling-validation sensitivity, лучше по локальным метрикам (`MAE 3D 15.316` против `zero 16.251`) и дает лучший mean rollout error (`95.471 m` против `train_mean 97.994 m`), но fold 3 все еще сильно дрейфует.
 
@@ -461,7 +461,7 @@ python3 src/run_dataflash_sequence_baseline.py \
 Финальная сводка текущего DataFlash-кандидата:
 
 - `reports/final_dataflash_report.md`;
-- `artifacts/generated/dataflash_final_report/index.html`.
+- `artifacts/generated/dataflash/final_report/index.html`.
 
 ## Что уточнить у преподавателя
 
