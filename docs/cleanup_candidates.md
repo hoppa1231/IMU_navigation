@@ -12,7 +12,7 @@ longer referenced by the default commands.
 | path | reason |
 | --- | --- |
 | `src/__pycache__/` | Python bytecode cache. |
-| `reports/poli_na_rollout_seq100.md` | Old sequence-length test report; default POLI_NA report is `reports/poli_na_rollout.md`. |
+| `reports/poli_na_rollout_seq100.md` | Old sequence-length test report; default POLI_NA report is `reports/navigation/poli_na_rollout.md`. |
 | `derived/predictions/poli_na_rollout/poli_na_rollout_seq100.csv` | Superseded POLI_NA test output; default output is `poli_na_rollout.csv`. |
 | `artifacts/generated/navigation/poli_na_rollout/index_seq100.html` | Superseded POLI_NA HTML from the same sequence-length test. |
 

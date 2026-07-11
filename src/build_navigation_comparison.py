@@ -58,7 +58,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--report",
         type=Path,
-        default=Path("reports/navigation_comparison.md"),
+        default=Path("reports/navigation/navigation_comparison.md"),
     )
     return parser.parse_args()
 

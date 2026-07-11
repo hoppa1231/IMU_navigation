@@ -10,7 +10,7 @@ Original GPS-capable files inspected:
 - `artifacts/triangle_15_01_2025.csv`
 - `artifacts/data.csv`
 
-Generated files are written under `artifacts/generated/`.
+Generated files are written under grouped subdirectories in `artifacts/generated/`.
 
 ## Continuous tracks
 

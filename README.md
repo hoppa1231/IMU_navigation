@@ -10,6 +10,7 @@
 - `artifacts/data.csv` - комбинированный файл с несколькими полетами, использовать только через segment-aware скрипты.
 - `derived/` и `artifacts/generated/` - воспроизводимые результаты, датасеты, предсказания и HTML-визуализации; в Git не коммитятся.
 - В Git храним код, README/docs, requirements, небольшие осмысленные Markdown-отчеты.
+- Активные итоговые отчеты лежат в `reports/navigation/` и `reports/final/`, exploratory notebooks в `jupyter/exploration/`, итоговые reproducible notebooks в `jupyter/final/`.
 
 ## Что от нас хотят
 
@@ -133,7 +134,7 @@ python3 src/gps_flight_map.py \
 python3 src/gps_flight_inventory.py
 ```
 
-Текущий отчет: `reports/gps_flight_inventory.md`. Он показывает, что `artifacts/data.csv` содержит 7 сегментов по сбросам `TimeStamp`, а `linear`, `triangle` и DataFlash GPS/POS выглядят как отдельные непрерывные треки.
+Текущий отчет: `reports/navigation/gps_flight_inventory.md`. Он показывает, что `artifacts/data.csv` содержит 7 сегментов по сбросам `TimeStamp`, а `linear`, `triangle` и DataFlash GPS/POS выглядят как отдельные непрерывные треки.
 
 Каталог полетов для дальнейшего обучения:
 
@@ -145,7 +146,7 @@ python3 src/build_flight_index.py
 
 - `derived/datasets/flight_index.csv`;
 - `derived/datasets/flight_index.json`;
-- `reports/flight_index.md`.
+- `reports/navigation/flight_index.md`.
 
 Единые GPS-треки в локальных метрах:
 
@@ -159,7 +160,7 @@ python3 src/prepare_flight_tracks.py
 - `artifacts/generated/gps/flights/index.html` - единая страница выбора и просмотра треков;
 - `artifacts/generated/gps/flights/{flight_id}/map.html`;
 - `artifacts/generated/gps/flights/{flight_id}/simulation.html`;
-- `reports/flight_tracks.md`.
+- `reports/navigation/flight_tracks.md`.
 
 Важно: GPS-координаты в `track.csv` остаются эталоном/target, а не входными признаками для навигации без GNSS.
 
@@ -241,7 +242,7 @@ python3 src/build_trajectory_overlay.py
 
 - `artifacts/generated/navigation/trajectory_overlay/index.html` - интерактивное наложение GPS и накопленной IMU/flow-траектории;
 - `derived/predictions/trajectory_overlay/rollout.csv` - точки rollout и ошибки;
-- `reports/trajectory_overlay.md` - итоговые метрики drift/error.
+- `reports/navigation/trajectory_overlay.md` - итоговые метрики drift/error.
 
 Если между неперекрывающимися prediction-окнами есть большой разрыв, rollout автоматически разбивается на сегменты, чтобы не изображать отсутствие предсказаний как непрерывную инерциальную навигацию.
 
@@ -257,7 +258,7 @@ python3 src/build_imu_dead_reckoning.py
 
 - `artifacts/generated/navigation/imu_dead_reckoning/index.html` - наложение GPS/POS и чистой IMU-траектории;
 - `derived/predictions/imu_dead_reckoning/dataflash_imu_dr.csv` - точки, скорости, ускорения и ошибки;
-- `reports/imu_dead_reckoning.md` - финальная ошибка и интерпретация.
+- `reports/navigation/imu_dead_reckoning.md` - финальная ошибка и интерпретация.
 
 Это намеренно не EKF и не ML-модель: GPS используется только для стартовой точки и проверки ошибки в конце.
 
@@ -279,7 +280,7 @@ python3 src/build_flow_dead_reckoning.py --include-combined-data
 
 - `artifacts/generated/navigation/flow_dead_reckoning/index.html` - наложение реальной GPS-траектории и расчетной flow/IMU-траектории;
 - `derived/predictions/flow_dead_reckoning/flow_dr.csv` - точки траекторий, скорости и ошибки;
-- `reports/flow_dead_reckoning.md` - итоговые метрики.
+- `reports/navigation/flow_dead_reckoning.md` - итоговые метрики.
 
 ## Проверка POLI_NA
 
@@ -295,7 +296,7 @@ PYTHONPATH=/tmp/poli_deps python3 src/run_poli_na_rollout.py
 
 - `artifacts/generated/navigation/poli_na_rollout/index.html` - наложение реальной GPS и POLI_NA rollout;
 - `derived/predictions/poli_na_rollout/poli_na_rollout.csv` - точки rollout;
-- `reports/poli_na_rollout.md` - метрики по пресетам.
+- `reports/navigation/poli_na_rollout.md` - метрики по пресетам.
 
 Проверка альтернативных target:
 
@@ -460,7 +461,7 @@ python3 src/run_dataflash_sequence_baseline.py \
 
 Финальная сводка текущего DataFlash-кандидата:
 
-- `reports/final_dataflash_report.md`;
+- `reports/final/final_dataflash_report.md`;
 - `artifacts/generated/dataflash/final_report/index.html`.
 
 Воспроизводимый one-command pipeline для текущего best DataFlash-кандидата:
@@ -475,7 +476,7 @@ python3 src/run_best_dataflash_pipeline.py
 - `artifacts/generated/dataflash/predictions/sequence_fixed100_shrink/index.html`;
 - rollout CSV и rollout HTML по baseline/model variants;
 - `reports/experiments/dataflash_rollout_summary.md`;
-- `reports/final_dataflash_report.md`;
+- `reports/final/final_dataflash_report.md`;
 - `artifacts/generated/dataflash/final_report/index.html`.
 
 Единая comparison page по GPS/POS, IMU, flow, POLI_NA и best DataFlash rollout:
@@ -487,7 +488,7 @@ python3 src/build_navigation_comparison.py
 Результаты:
 
 - `artifacts/generated/navigation/comparison/index.html`;
-- `reports/navigation_comparison.md`.
+- `reports/navigation/navigation_comparison.md`.
 
 ## Что уточнить у преподавателя
 

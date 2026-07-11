@@ -81,7 +81,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--rollout-dir", type=Path, default=Path("derived/predictions/dataflash_rollout"))
     parser.add_argument("--rollout-summary", type=Path, default=Path("reports/experiments/dataflash_rollout_summary.md"))
-    parser.add_argument("--final-report", type=Path, default=Path("reports/final_dataflash_report.md"))
+    parser.add_argument("--final-report", type=Path, default=Path("reports/final/final_dataflash_report.md"))
     parser.add_argument(
         "--prediction-viewer",
         type=Path,

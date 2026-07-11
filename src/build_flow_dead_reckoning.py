@@ -83,7 +83,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--out-csv", type=Path, default=Path("derived/predictions/flow_dead_reckoning/flow_dr.csv"))
     parser.add_argument("--html", type=Path, default=Path("artifacts/generated/navigation/flow_dead_reckoning/index.html"))
-    parser.add_argument("--report", type=Path, default=Path("reports/flow_dead_reckoning.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/navigation/flow_dead_reckoning.md"))
     parser.add_argument("--max-html-points", type=int, default=4000)
     return parser.parse_args()
 

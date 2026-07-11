@@ -111,7 +111,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--out-csv", type=Path, default=Path("derived/predictions/poli_na_rollout/poli_na_rollout.csv"))
     parser.add_argument("--html", type=Path, default=Path("artifacts/generated/navigation/poli_na_rollout/index.html"))
-    parser.add_argument("--report", type=Path, default=Path("reports/poli_na_rollout.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/navigation/poli_na_rollout.md"))
     parser.add_argument("--max-html-points", type=int, default=3000)
     return parser.parse_args()
 

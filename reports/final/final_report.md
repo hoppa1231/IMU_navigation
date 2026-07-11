@@ -139,7 +139,7 @@ python3 src/build_navigation_comparison.py
 It produces:
 
 - `artifacts/generated/navigation/comparison/index.html`
-- `reports/navigation_comparison.md`
+- `reports/navigation/navigation_comparison.md`
 
 The next analysis task after that is a stricter apples-to-apples comparison on
 the same raw trajectory source across all methods.

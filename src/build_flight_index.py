@@ -101,7 +101,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataflash-dir", type=Path, default=DATAFLASH_DIR)
     parser.add_argument("--out-csv", type=Path, default=Path("derived/datasets/flight_index.csv"))
     parser.add_argument("--out-json", type=Path, default=Path("derived/datasets/flight_index.json"))
-    parser.add_argument("--report", type=Path, default=Path("reports/flight_index.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/navigation/flight_index.md"))
     parser.add_argument("--min-status", type=float, default=3.0)
     parser.add_argument("--max-hdop", type=float, default=None)
     parser.add_argument("--max-gap-s", type=float, default=2.0)
@@ -473,7 +473,7 @@ def write_report(path: Path, records: list[FlightRecord]) -> None:
         "",
         "- `derived/datasets/flight_index.csv`",
         "- `derived/datasets/flight_index.json`",
-        "- `reports/flight_index.md`",
+        "- `reports/navigation/flight_index.md`",
         "",
         "No new files are written to the root of `artifacts/`.",
         "",

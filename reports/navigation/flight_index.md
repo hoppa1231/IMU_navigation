@@ -13,7 +13,7 @@ Generated outputs from this step:
 
 - `derived/datasets/flight_index.csv`
 - `derived/datasets/flight_index.json`
-- `reports/flight_index.md`
+- `reports/navigation/flight_index.md`
 
 No new files are written to the root of `artifacts/`.
 

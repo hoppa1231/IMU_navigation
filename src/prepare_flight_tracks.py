@@ -32,7 +32,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tracks-dir", type=Path, default=Path("derived/datasets/tracks"))
     parser.add_argument("--visual-dir", type=Path, default=Path("artifacts/generated/gps/flights"))
     parser.add_argument("--viewer-html", type=Path, default=Path("artifacts/generated/gps/flights/index.html"))
-    parser.add_argument("--report", type=Path, default=Path("reports/flight_tracks.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/navigation/flight_tracks.md"))
     parser.add_argument("--min-status", type=float, default=3.0)
     parser.add_argument("--max-hdop", type=float, default=None)
     parser.add_argument("--max-gap-s", type=float, default=2.0)

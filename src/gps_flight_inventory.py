@@ -21,7 +21,7 @@ DEFAULT_SOURCES = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sources", type=Path, nargs="*", default=DEFAULT_SOURCES)
-    parser.add_argument("--report", type=Path, default=Path("reports/gps_flight_inventory.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/navigation/gps_flight_inventory.md"))
     parser.add_argument("--min-status", type=float, default=3.0)
     parser.add_argument("--max-hdop", type=float, default=None)
     parser.add_argument("--max-gap-s", type=float, default=2.0)

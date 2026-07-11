@@ -68,5 +68,5 @@ Final HTML dashboard: `artifacts/generated/dataflash/final_report/index.html`
 
 - `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100_shrink.md`
 - `reports/experiments/dataflash_rollout_summary.md`
-- `reports/final_dataflash_report.md`
+- `reports/final/final_dataflash_report.md`
 - `artifacts/generated/dataflash/final_report/index.html`

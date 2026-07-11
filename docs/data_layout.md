@@ -67,6 +67,14 @@ Keep these in Git:
 - `reports/` Markdown summaries when they contain interpretation worth keeping.
 - `jupyter/` notebooks only when they are small and intentional.
 
+Current versioned report/notebook structure:
+
+- `reports/navigation/` for active navigation outputs.
+- `reports/final/` for current final summaries.
+- `reports/experiments/` for generated experiment comparisons.
+- `jupyter/exploration/` for exploratory notebooks.
+- `jupyter/final/` for reproducible final notebooks.
+
 Do not commit:
 
 - raw telemetry files;
