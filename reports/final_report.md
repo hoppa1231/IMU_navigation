@@ -124,14 +124,12 @@ The current repository does not yet prove these stronger claims:
 
 ## Next Practical Step
 
-The next useful engineering step is to build one reproducible command for the
-best DataFlash pipeline that produces:
+The reproducible best-DataFlash pipeline now exists:
 
-1. prediction CSV;
-2. sparse rollout CSV;
-3. grouped HTML viewers;
-4. final comparison summary.
+```bash
+python3 src/run_best_dataflash_pipeline.py
+```
 
-After that, the right next analysis task is to build a single comparison page
-that places GPS/POS, flow, POLI_NA, and DataFlash trajectories side by side for
+The next analysis task is to build a single comparison page that places
+GPS/POS, flow, POLI_NA, and DataFlash trajectories side by side for
 presentation.
