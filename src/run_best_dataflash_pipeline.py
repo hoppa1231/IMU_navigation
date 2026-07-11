@@ -87,6 +87,7 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("artifacts/generated/dataflash/predictions/sequence_fixed100_shrink/index.html"),
     )
+    parser.add_argument("--demo-html", type=Path, default=Path("artifacts/generated/dataflash/demo/index.html"))
     parser.add_argument("--final-html", type=Path, default=Path("artifacts/generated/dataflash/final_report/index.html"))
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
     return parser.parse_args()
@@ -311,6 +312,7 @@ def write_final_html(
     path: Path,
     prediction_viewer: Path,
     best_rollout_html: Path,
+    demo_html: Path,
     local_metrics: dict[str, LocalMetrics],
     model_rollouts: dict[str, RolloutMetrics],
 ) -> None:
@@ -319,6 +321,7 @@ def write_final_html(
     best_rollout = model_rollouts[BEST_MODEL]
     pred_link = html.escape(os.path.relpath(prediction_viewer, start=path.parent).replace(os.sep, "/"))
     rollout_link = html.escape(os.path.relpath(best_rollout_html, start=path.parent).replace(os.sep, "/"))
+    demo_link = html.escape(os.path.relpath(demo_html, start=path.parent).replace(os.sep, "/"))
     rows_html = "\n".join(
         "<tr>"
         f"<td>{html.escape(MODEL_LABELS[model_name])}</td>"
@@ -422,6 +425,7 @@ def write_final_html(
       <h2>Viewers</h2>
       <p><a href="{pred_link}">Prediction viewer</a></p>
       <p><a href="{rollout_link}">Best rollout viewer</a></p>
+      <p><a href="{demo_link}">Animated rollout demo</a></p>
     </section>
     <section>
       <h2>Model Comparison</h2>
@@ -509,7 +513,22 @@ def main() -> None:
         model_rollouts,
     )
     best_rollout_html = Path("artifacts/generated/dataflash/rollouts") / MODEL_HTML_DIRS[BEST_MODEL] / "index.html"
-    write_final_html(args.final_html, args.prediction_viewer, best_rollout_html, local_metrics, model_rollouts)
+    run_step(
+        args.python,
+        "build_dataflash_demo.py",
+        "--rollout-csv",
+        str(args.rollout_dir / MODEL_ROLLOUT_NAMES[BEST_MODEL]),
+        "--output",
+        str(args.demo_html),
+    )
+    write_final_html(
+        args.final_html,
+        args.prediction_viewer,
+        best_rollout_html,
+        args.demo_html,
+        local_metrics,
+        model_rollouts,
+    )
 
     print(f"Wrote {args.final_report}")
     print(f"Wrote {args.final_html}")

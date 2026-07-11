@@ -475,6 +475,7 @@ python3 src/run_best_dataflash_pipeline.py
 - `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100_shrink.md`;
 - `artifacts/generated/dataflash/predictions/sequence_fixed100_shrink/index.html`;
 - rollout CSV и rollout HTML по baseline/model variants;
+- `artifacts/generated/dataflash/demo/index.html`;
 - `reports/experiments/dataflash_rollout_summary.md`;
 - `reports/final/final_dataflash_report.md`;
 - `artifacts/generated/dataflash/final_report/index.html`.
