@@ -478,6 +478,17 @@ python3 src/run_best_dataflash_pipeline.py
 - `reports/final_dataflash_report.md`;
 - `artifacts/generated/dataflash/final_report/index.html`.
 
+Единая comparison page по GPS/POS, IMU, flow, POLI_NA и best DataFlash rollout:
+
+```bash
+python3 src/build_navigation_comparison.py
+```
+
+Результаты:
+
+- `artifacts/generated/navigation/comparison/index.html`;
+- `reports/navigation_comparison.md`.
+
 ## Что уточнить у преподавателя
 
 - Какие именно моторные признаки считать "мощностью": PWM/`RCOU`, `MOTB.ThrOut`, ток/напряжение из `BAT`, или уже готовые значения из другого файла?

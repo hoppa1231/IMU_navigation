@@ -130,6 +130,16 @@ The reproducible best-DataFlash pipeline now exists:
 python3 src/run_best_dataflash_pipeline.py
 ```
 
-The next analysis task is to build a single comparison page that places
-GPS/POS, flow, POLI_NA, and DataFlash trajectories side by side for
-presentation.
+A single comparison page also now exists:
+
+```bash
+python3 src/build_navigation_comparison.py
+```
+
+It produces:
+
+- `artifacts/generated/navigation/comparison/index.html`
+- `reports/navigation_comparison.md`
+
+The next analysis task after that is a stricter apples-to-apples comparison on
+the same raw trajectory source across all methods.
