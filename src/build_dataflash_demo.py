@@ -15,13 +15,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--rollout-csv",
         type=Path,
-        default=Path("derived/predictions/dataflash_rollout/imu_att_h5000_l5000_sequence_fixed100_shrink_rollout.csv"),
+        default=Path("derived/predictions/dataflash_rollout/imu_att_h5000_l5000_sequence_fixed100_bias_rollout.csv"),
     )
     parser.add_argument(
         "--output",
         type=Path,
         default=Path("artifacts/generated/dataflash/demo/index.html"),
     )
+    parser.add_argument("--model-label", default="sequence_ridge_bias_corrected")
     return parser.parse_args()
 
 
@@ -73,36 +74,10 @@ def build_payload(rows: list[dict[str, str]]) -> list[dict[str, object]]:
                 "max_error_m": max(errors) if errors else math.nan,
             }
         )
-    if rows:
-        all_rows = [
-            {
-                "step": float(index + 1),
-                "time_s": as_float(row["time_s"]),
-                "true_east_m": as_float(row["true_east_m"]),
-                "true_north_m": as_float(row["true_north_m"]),
-                "true_up_m": as_float(row["true_up_m"]),
-                "pred_east_m": as_float(row["pred_east_m"]),
-                "pred_north_m": as_float(row["pred_north_m"]),
-                "pred_up_m": as_float(row["pred_up_m"]),
-                "err_3d_m": as_float(row["err_3d_m"]),
-            }
-            for index, row in enumerate(rows)
-        ]
-        payload.append(
-            {
-                "id": "all",
-                "label": "All folds",
-                "rows": all_rows,
-                "duration_s": max(item["time_s"] for item in all_rows) - min(item["time_s"] for item in all_rows),
-                "final_error_m": all_rows[-1]["err_3d_m"],
-                "mean_error_m": sum(item["err_3d_m"] for item in all_rows) / len(all_rows),
-                "max_error_m": max(item["err_3d_m"] for item in all_rows),
-            }
-        )
     return payload
 
 
-def html_template(payload: list[dict[str, object]]) -> str:
+def html_template(payload: list[dict[str, object]], model_label: str) -> str:
     data = json.dumps(payload, ensure_ascii=True)
     return f"""<!doctype html>
 <html lang="en">
@@ -240,8 +215,8 @@ def html_template(payload: list[dict[str, object]]) -> str:
 </head>
 <body>
   <header>
-    <h1>DataFlash Rollout Demo</h1>
-    <div class="muted">Predicted trajectory is drawn step by step against the real POS/GPS reference.</div>
+    <h1>DataFlash 3D Rollout</h1>
+    <div class="muted">{model_label}: real POS/GPS and predicted route with relative altitude.</div>
   </header>
   <div class="controls">
     <select id="caseSelect" aria-label="Scenario"></select>
@@ -263,6 +238,8 @@ def html_template(payload: list[dict[str, object]]) -> str:
         <div class="metric"><span>Step</span><strong id="stepValue">-</strong></div>
         <div class="metric"><span>Time</span><strong id="timeValue">-</strong></div>
         <div class="metric"><span>Current Error</span><strong id="currentError">-</strong></div>
+        <div class="metric"><span>Real Altitude</span><strong id="trueAltitude">-</strong></div>
+        <div class="metric"><span>Predicted Altitude</span><strong id="predAltitude">-</strong></div>
       </div>
       <div class="panel">
         <div class="metric"><span>Final Error</span><strong id="finalError">-</strong></div>
@@ -271,7 +248,7 @@ def html_template(payload: list[dict[str, object]]) -> str:
       </div>
       <div class="panel">
         <div class="legend">
-          <div class="key"><span class="swatch" style="background:#94a3b8"></span><span>full real reference</span></div>
+          <div class="key"><span class="swatch" style="background:#94a3b8"></span><span>ground projection</span></div>
           <div class="key"><span class="swatch" style="background:#2563eb"></span><span>real trajectory so far</span></div>
           <div class="key"><span class="swatch" style="background:#dc2626"></span><span>predicted trajectory so far</span></div>
         </div>
@@ -291,6 +268,8 @@ def html_template(payload: list[dict[str, object]]) -> str:
     const stepValue = document.getElementById('stepValue');
     const timeValue = document.getElementById('timeValue');
     const currentError = document.getElementById('currentError');
+    const trueAltitude = document.getElementById('trueAltitude');
+    const predAltitude = document.getElementById('predAltitude');
     const finalError = document.getElementById('finalError');
     const meanError = document.getElementById('meanError');
     const maxError = document.getElementById('maxError');
@@ -328,23 +307,29 @@ def html_template(payload: list[dict[str, object]]) -> str:
       const actualMaxX = Math.max(...xs);
       const actualMinY = Math.min(...ys);
       const actualMaxY = Math.max(...ys);
+      const zs = rows.flatMap((row) => [row.true_up_m, row.pred_up_m]);
+      const minZ = Math.min(...zs);
+      const maxZ = Math.max(...zs);
       const pad = 34;
       const spanX = Math.max(1, actualMaxX - actualMinX);
       const spanY = Math.max(1, actualMaxY - actualMinY);
-      const scale = Math.min((width - pad * 2) / spanX, (height - pad * 2) / spanY);
+      const scale = Math.min((width - pad * 2) / spanX, (height - pad * 2) / spanY) * 0.78;
       const offsetX = (width - spanX * scale) / 2;
       const offsetY = (height - spanY * scale) / 2;
-      return (east, north) => ({{
-        x: offsetX + (east - actualMinX) * scale,
-        y: height - offsetY - (north - actualMinY) * scale,
-      }});
+      const spanZ = Math.max(1, maxZ - minZ);
+      return (east, north, up = minZ) => {{
+        const groundX = offsetX + (east - actualMinX) * scale;
+        const groundY = height - offsetY - (north - actualMinY) * scale;
+        const lift = (up - minZ) / spanZ * Math.min(150, height * 0.24);
+        return {{ x: groundX, y: groundY - lift, groundX, groundY }};
+      }};
     }}
 
-    function pathString(rows, eastKey, northKey, project, count, move = false) {{
+    function pathString(rows, eastKey, northKey, upKey, project, count) {{
       const active = rows.slice(0, count);
       return active.map((row, index) => {{
-        const point = project(row[eastKey], row[northKey]);
-        return `${{index || move ? 'L' : 'M'}} ${{point.x.toFixed(2)}} ${{point.y.toFixed(2)}}`;
+        const point = project(row[eastKey], row[northKey], row[upKey]);
+        return `${{index ? 'L' : 'M'}} ${{point.x.toFixed(2)}} ${{point.y.toFixed(2)}}`;
       }}).join(' ');
     }}
 
@@ -358,19 +343,24 @@ def html_template(payload: list[dict[str, object]]) -> str:
       const project = projectFactory(rows, width, height);
       const count = Math.max(1, Math.min(rows.length, Math.round(playhead)));
       const current = rows[count - 1];
-      const trueEnd = project(current.true_east_m, current.true_north_m);
-      const predEnd = project(current.pred_east_m, current.pred_north_m);
+      const trueEnd = project(current.true_east_m, current.true_north_m, current.true_up_m);
+      const predEnd = project(current.pred_east_m, current.pred_north_m, current.pred_up_m);
 
-      const fullReference = pathString(rows, 'true_east_m', 'true_north_m', project, rows.length);
-      const trueSoFar = pathString(rows, 'true_east_m', 'true_north_m', project, count);
-      const predSoFar = pathString(rows, 'pred_east_m', 'pred_north_m', project, count);
+      const groundReference = pathString(rows, 'true_east_m', 'true_north_m', 'ground_up_m',
+        (e, n) => project(e, n), rows.length);
+      const trueSoFar = pathString(rows, 'true_east_m', 'true_north_m', 'true_up_m', project, count);
+      const predSoFar = pathString(rows, 'pred_east_m', 'pred_north_m', 'pred_up_m', project, count);
 
       svg.setAttribute('viewBox', `0 0 ${{width}} ${{height}}`);
       svg.innerHTML = `
         <rect x="0" y="0" width="${{width}}" height="${{height}}" fill="#eef2f6" rx="8" />
-        <path d="${{fullReference}}" fill="none" stroke="#94a3b8" stroke-width="2" stroke-opacity="0.5"/>
+        <path d="${{groundReference}}" fill="none" stroke="#94a3b8" stroke-width="2" stroke-opacity="0.55" stroke-dasharray="5 5"/>
         <path d="${{trueSoFar}}" fill="none" stroke="#2563eb" stroke-width="2.8"/>
         <path d="${{predSoFar}}" fill="none" stroke="#dc2626" stroke-width="2.8"/>
+        <line x1="${{trueEnd.x.toFixed(2)}}" y1="${{trueEnd.y.toFixed(2)}}" x2="${{trueEnd.groundX.toFixed(2)}}" y2="${{trueEnd.groundY.toFixed(2)}}" stroke="#2563eb" stroke-opacity="0.45" stroke-width="1.5"/>
+        <line x1="${{predEnd.x.toFixed(2)}}" y1="${{predEnd.y.toFixed(2)}}" x2="${{predEnd.groundX.toFixed(2)}}" y2="${{predEnd.groundY.toFixed(2)}}" stroke="#dc2626" stroke-opacity="0.45" stroke-width="1.5"/>
+        <ellipse cx="${{trueEnd.groundX.toFixed(2)}}" cy="${{trueEnd.groundY.toFixed(2)}}" rx="8" ry="3" fill="#2563eb" fill-opacity="0.2"/>
+        <ellipse cx="${{predEnd.groundX.toFixed(2)}}" cy="${{predEnd.groundY.toFixed(2)}}" rx="8" ry="3" fill="#dc2626" fill-opacity="0.2"/>
         <circle cx="${{trueEnd.x.toFixed(2)}}" cy="${{trueEnd.y.toFixed(2)}}" r="5.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
         <circle cx="${{predEnd.x.toFixed(2)}}" cy="${{predEnd.y.toFixed(2)}}" r="5.5" fill="#dc2626" stroke="#ffffff" stroke-width="2"/>
       `;
@@ -379,12 +369,12 @@ def html_template(payload: list[dict[str, object]]) -> str:
       stepValue.textContent = `${{count}} / ${{rows.length}}`;
       timeValue.textContent = `${{current.time_s.toFixed(3)}} s`;
       currentError.textContent = `${{current.err_3d_m.toFixed(3)}} m`;
+      trueAltitude.textContent = `${{current.true_up_m.toFixed(2)}} m`;
+      predAltitude.textContent = `${{current.pred_up_m.toFixed(2)}} m`;
       finalError.textContent = `${{data.final_error_m.toFixed(3)}} m`;
       meanError.textContent = `${{data.mean_error_m.toFixed(3)}} m`;
       maxError.textContent = `${{data.max_error_m.toFixed(3)}} m`;
-      caseNote.textContent = data.id === 'all'
-        ? 'All folds are concatenated in file order. For the cleanest playback, inspect individual folds.'
-        : 'Sparse rollout uses non-overlapping 5-second displacement predictions from the best DataFlash model.';
+      caseNote.textContent = 'Each fold is a separate test interval. Altitude is relative to the first POS point of the complete flight.';
     }}
 
     function tick(timestamp) {{
@@ -445,7 +435,7 @@ def main() -> None:
     rows = read_rows(args.rollout_csv)
     payload = build_payload(rows)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(html_template(payload), encoding="utf-8")
+    args.output.write_text(html_template(payload, args.model_label), encoding="utf-8")
     print(f"Wrote {args.output}")
 
 
