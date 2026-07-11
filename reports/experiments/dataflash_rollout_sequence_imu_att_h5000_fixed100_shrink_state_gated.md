@@ -8,30 +8,31 @@ Gated rollout CSV: `derived/predictions/dataflash_rollout/imu_att_h5000_l5000_se
 HTML: `artifacts/generated/dataflash/rollouts/sequence_fixed100_shrink_state_gated/index.html`
 
 Horizontal gating policy:
-- `hover` -> scale XY by `0.40`
+- `hover` -> scale XY by `0.50`
 - `climb/descent` -> scale XY by `1.00`
 - `translate` -> scale XY by `1.00`
+- `fast translate` override disabled
 
 ## Overall
 
 - steps: 87
 - baseline final 3D: 52.818 m
-- gated final 3D: 53.698 m
+- gated final 3D: 52.389 m
 - baseline mean 3D: 93.538 m
-- gated mean 3D: 86.159 m
+- gated mean 3D: 87.255 m
 - baseline final horizontal: 51.988 m
-- gated final horizontal: 52.881 m
+- gated final horizontal: 51.552 m
 - baseline mean horizontal: 92.085 m
-- gated mean horizontal: 84.688 m
+- gated mean horizontal: 85.787 m
 
 ## By State
 
 | state | rows | gated mean 3D | gated p95 3D | gated mean horiz | gated p95 horiz | mean delta 3D vs baseline | mean delta horiz vs baseline |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `hover` | 22 | 88.565 | 140.370 | 87.189 | 136.006 | -7.197 | -7.246 |
-| `climb` | 7 | 65.055 | 108.456 | 62.012 | 108.328 | -8.141 | -8.198 |
-| `descent` | 18 | 62.410 | 117.850 | 61.194 | 117.804 | -4.568 | -4.568 |
-| `translate` | 40 | 99.216 | 155.108 | 97.854 | 155.090 | -8.612 | -8.612 |
+| `hover` | 22 | 89.548 | 139.887 | 88.178 | 135.487 | -6.214 | -6.257 |
+| `climb` | 7 | 66.372 | 112.981 | 63.337 | 112.858 | -6.824 | -6.873 |
+| `descent` | 18 | 63.008 | 119.795 | 61.792 | 119.750 | -3.969 | -3.970 |
+| `translate` | 40 | 100.560 | 159.682 | 99.198 | 157.116 | -7.267 | -7.268 |
 
 Interpretation: negative delta means the gated rollout improved error relative to the current best baseline.
 

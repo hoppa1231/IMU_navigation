@@ -51,9 +51,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hover-horizontal-speed", type=float, default=0.6)
     parser.add_argument("--vertical-speed-threshold", type=float, default=0.35)
     parser.add_argument("--vertical-emphasis-speed", type=float, default=0.8)
-    parser.add_argument("--hover-horizontal-scale", type=float, default=0.0)
-    parser.add_argument("--vertical-horizontal-scale", type=float, default=0.45)
+    parser.add_argument("--hover-horizontal-scale", type=float, default=0.5)
+    parser.add_argument("--vertical-horizontal-scale", type=float, default=1.0)
     parser.add_argument("--translate-horizontal-scale", type=float, default=1.0)
+    parser.add_argument("--translate-fast-threshold", type=float, default=math.inf)
+    parser.add_argument("--translate-fast-horizontal-scale", type=float, default=1.0)
     return parser.parse_args()
 
 
@@ -100,11 +102,13 @@ def classify_state(
     return "translate"
 
 
-def horizontal_scale_for_state(args: argparse.Namespace, state: str) -> float:
+def horizontal_scale_for_state(args: argparse.Namespace, state: str, horizontal_speed_mps: float) -> float:
     if state == "hover":
         return args.hover_horizontal_scale
     if state in {"climb", "descent"}:
         return args.vertical_horizontal_scale
+    if state == "translate" and horizontal_speed_mps >= args.translate_fast_threshold:
+        return args.translate_fast_horizontal_scale
     return args.translate_horizontal_scale
 
 
@@ -145,7 +149,7 @@ def build_fold_rollout(
             vertical_speed_threshold=args.vertical_speed_threshold,
             vertical_emphasis_speed=args.vertical_emphasis_speed,
         )
-        horizontal_scale = horizontal_scale_for_state(args, state)
+        horizontal_scale = horizontal_scale_for_state(args, state, horizontal_speed)
         gated_dx_e = pred_dx_e * horizontal_scale
         gated_dx_n = pred_dx_n * horizontal_scale
         gated_dz_u = pred_dz_u
@@ -277,6 +281,12 @@ def write_report(path: Path, args: argparse.Namespace, rows: list[dict[str, floa
         f"- `hover` -> scale XY by `{args.hover_horizontal_scale:.2f}`",
         f"- `climb/descent` -> scale XY by `{args.vertical_horizontal_scale:.2f}`",
         f"- `translate` -> scale XY by `{args.translate_horizontal_scale:.2f}`",
+        (
+            f"- `fast translate` (`horizontal speed >= {args.translate_fast_threshold:.2f} m/s`) "
+            f"-> scale XY by `{args.translate_fast_horizontal_scale:.2f}`"
+            if math.isfinite(args.translate_fast_threshold)
+            else "- `fast translate` override disabled"
+        ),
         "",
         "## Overall",
         "",
@@ -353,7 +363,7 @@ def html_template(rows: list[dict[str, float | str]], args: argparse.Namespace) 
 <body>
   <header>
     <h1>DataFlash State-Gated Rollout</h1>
-    <div class="muted">Policy: hover={args.hover_horizontal_scale:.2f}, climb/descent={args.vertical_horizontal_scale:.2f}, translate={args.translate_horizontal_scale:.2f} for horizontal displacement scaling.</div>
+    <div class="muted">Policy: hover={args.hover_horizontal_scale:.2f}, climb/descent={args.vertical_horizontal_scale:.2f}, translate={args.translate_horizontal_scale:.2f}, fast-translate={args.translate_fast_horizontal_scale:.2f} above {args.translate_fast_threshold if math.isfinite(args.translate_fast_threshold) else float("inf"):.2f} m/s.</div>
   </header>
   <main>
     <section class="left">
