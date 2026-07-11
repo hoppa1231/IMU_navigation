@@ -18,7 +18,7 @@ env/
 
 # Local source data and generated artifacts.
 # See docs/data_layout.md for the data policy.
-/artifacts/
+/artifacts/initial/
 /derived/
 
 # Generated reports that are useful locally but should be regenerated, not versioned.

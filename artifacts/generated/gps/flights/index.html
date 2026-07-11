@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flight Track Viewer</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --line: #d9e0e6;
+      --text: #17202a;
+      --muted: #667482;
+      --accent: #1769aa;
+      --ok: #2f7d4f;
+      --warn: #b86b15;
+      --danger: #b63b3b;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    body {
+      overflow: hidden;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      height: 100vh;
+    }
+    aside {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      min-width: 0;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+    header {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 116px;
+      gap: 8px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    input, select {
+      width: 100%;
+      height: 36px;
+      border: 1px solid #c5ced6;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      padding: 0 10px;
+    }
+    .flight-list {
+      overflow: auto;
+      padding: 8px;
+    }
+    .flight {
+      width: 100%;
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+      font: inherit;
+    }
+    .flight:hover {
+      background: #f2f5f7;
+    }
+    .flight.active {
+      border-color: #8bb8da;
+      background: #eaf3fa;
+    }
+    .flight-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .badge {
+      flex: 0 0 auto;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #e8ecef;
+      color: #4e5965;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .flight.active .badge {
+      background: #d6e8f5;
+      color: #14527d;
+    }
+    .flight-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      height: 100vh;
+    }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .selected-title {
+      min-width: 0;
+    }
+    .selected-title strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 17px;
+    }
+    .selected-title span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .stat {
+      min-width: 92px;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fbfcfd;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .stat strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+    .tabs button, .open-link {
+      height: 34px;
+      border: 1px solid #c5ced6;
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text);
+      padding: 0 12px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .tabs button.active {
+      border-color: #6da4cc;
+      background: #e5f1f9;
+      color: #114f79;
+    }
+    .open-link {
+      margin-left: auto;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+    .empty {
+      display: none;
+      padding: 24px;
+      color: var(--muted);
+    }
+    @media (max-width: 860px) {
+      body {
+        overflow: auto;
+      }
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 44vh 80vh;
+        height: auto;
+        min-height: 100vh;
+      }
+      aside, main {
+        height: auto;
+        min-height: 0;
+      }
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+      .stats {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <header>
+        <h1>Flight Track Viewer</h1>
+        <div class="sub"><span id="count"></span></div>
+      </header>
+      <div class="filters">
+        <input id="search" type="search" placeholder="flight_id или источник">
+        <select id="format">
+          <option value="all">Все</option>
+          <option value="module">Module</option>
+          <option value="dataflash">DataFlash</option>
+        </select>
+      </div>
+      <div id="flightList" class="flight-list"></div>
+    </aside>
+    <main>
+      <section class="topbar">
+        <div class="selected-title">
+          <strong id="selectedName"></strong>
+          <span id="selectedSource"></span>
+        </div>
+        <div class="stats">
+          <div class="stat">Длительность<strong id="statDuration"></strong></div>
+          <div class="stat">Дистанция<strong id="statDistance"></strong></div>
+          <div class="stat">Точки GPS<strong id="statPoints"></strong></div>
+          <div class="stat">Высота<strong id="statAltitude"></strong></div>
+          <div class="stat">Сегмент<strong id="statSegment"></strong></div>
+        </div>
+      </section>
+      <section class="workspace">
+        <nav class="tabs">
+          <button data-view="map" class="active">Карта</button>
+          <button data-view="replay">Replay</button>
+          <button data-view="plot">График</button>
+          <button data-view="csv">CSV</button>
+          <button data-view="geojson">GeoJSON</button>
+          <a id="openLink" class="open-link" href="#" target="_blank" rel="noreferrer">Открыть</a>
+        </nav>
+        <iframe id="viewer" title="Selected flight"></iframe>
+        <div id="empty" class="empty">Нет треков по фильтру.</div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const flights = [{"flight_id": "dataflash_2025_01_15", "source_file": "derived/dataflash", "source_format": "dataflash", "segment": "1/1", "gps_points": 4394, "sensor_rows": 87819, "duration_s": 879.216533, "duration_label": "14:39.2", "distance_m": 2449.443877488165, "distance_label": "2449.4 m", "altitude_label": "53.7..94.9 m", "max_gap_s": 0.600322, "paths": {"map": "dataflash_2025_01_15/map.html", "replay": "dataflash_2025_01_15/simulation.html", "plot": "dataflash_2025_01_15/path.svg", "geojson": "dataflash_2025_01_15/track.geojson", "csv": "../../../../derived/datasets/tracks/dataflash_2025_01_15_track.csv", "manifest": "dataflash_2025_01_15/manifest.json"}}, {"flight_id": "linear_15_01_2025", "source_file": "artifacts/linear_15_01_2025.csv", "source_format": "module", "segment": "1/1", "gps_points": 9274, "sensor_rows": 927041, "duration_s": 927.303, "duration_label": "15:27.3", "distance_m": 2328.441270640796, "distance_label": "2328.4 m", "altitude_label": "55.2..284.4 m", "max_gap_s": 0.123, "paths": {"map": "linear_15_01_2025/map.html", "replay": "linear_15_01_2025/simulation.html", "plot": "linear_15_01_2025/path.svg", "geojson": "linear_15_01_2025/track.geojson", "csv": "../../../../derived/datasets/tracks/linear_15_01_2025_track.csv", "manifest": "linear_15_01_2025/manifest.json"}}, {"flight_id": "module_data_s01", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "1/7", "gps_points": 1675, "sensor_rows": 167335, "duration_s": 167.389, "duration_label": "02:47.4", "distance_m": 31.009283620683693, "distance_label": "31.0 m", "altitude_label": "76.6..88.8 m", "max_gap_s": 0.126, "paths": {"map": "module_data_s01/map.html", "replay": "module_data_s01/simulation.html", "plot": "module_data_s01/path.svg", "geojson": "module_data_s01/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s01_track.csv", "manifest": "module_data_s01/manifest.json"}}, {"flight_id": "module_data_s02", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "2/7", "gps_points": 2340, "sensor_rows": 233823, "duration_s": 233.888, "duration_label": "03:53.9", "distance_m": 28.26858422407602, "distance_label": "28.3 m", "altitude_label": "65.2..77.2 m", "max_gap_s": 0.113, "paths": {"map": "module_data_s02/map.html", "replay": "module_data_s02/simulation.html", "plot": "module_data_s02/path.svg", "geojson": "module_data_s02/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s02_track.csv", "manifest": "module_data_s02/manifest.json"}}, {"flight_id": "module_data_s03", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "3/7", "gps_points": 1104, "sensor_rows": 110266, "duration_s": 110.3, "duration_label": "01:50.3", "distance_m": 39.175732569557326, "distance_label": "39.2 m", "altitude_label": "73.0..105.0 m", "max_gap_s": 0.128, "paths": {"map": "module_data_s03/map.html", "replay": "module_data_s03/simulation.html", "plot": "module_data_s03/path.svg", "geojson": "module_data_s03/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s03_track.csv", "manifest": "module_data_s03/manifest.json"}}, {"flight_id": "module_data_s04", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "4/7", "gps_points": 2141, "sensor_rows": 213757, "duration_s": 213.823, "duration_label": "03:33.8", "distance_m": 39.420445237885865, "distance_label": "39.4 m", "altitude_label": "49.2..70.5 m", "max_gap_s": 0.138, "paths": {"map": "module_data_s04/map.html", "replay": "module_data_s04/simulation.html", "plot": "module_data_s04/path.svg", "geojson": "module_data_s04/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s04_track.csv", "manifest": "module_data_s04/manifest.json"}}, {"flight_id": "module_data_s05", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "5/7", "gps_points": 387, "sensor_rows": 38538, "duration_s": 38.547, "duration_label": "00:38.5", "distance_m": 4.428708417364204, "distance_label": "4.4 m", "altitude_label": "60.8..63.7 m", "max_gap_s": 0.148, "paths": {"map": "module_data_s05/map.html", "replay": "module_data_s05/simulation.html", "plot": "module_data_s05/path.svg", "geojson": "module_data_s05/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s05_track.csv", "manifest": "module_data_s05/manifest.json"}}, {"flight_id": "module_data_s06", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "6/7", "gps_points": 10653, "sensor_rows": 1064552, "duration_s": 1064.919, "duration_label": "17:44.9", "distance_m": 1120.0198022838538, "distance_label": "1120.0 m", "altitude_label": "57.9..98.8 m", "max_gap_s": 0.134, "paths": {"map": "module_data_s06/map.html", "replay": "module_data_s06/simulation.html", "plot": "module_data_s06/path.svg", "geojson": "module_data_s06/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s06_track.csv", "manifest": "module_data_s06/manifest.json"}}, {"flight_id": "module_data_s07", "source_file": "artifacts/data.csv", "source_format": "module", "segment": "7/7", "gps_points": 5641, "sensor_rows": 563859, "duration_s": 564.046, "duration_label": "09:24.0", "distance_m": 1827.0810562851223, "distance_label": "1827.1 m", "altitude_label": "59.1..99.0 m", "max_gap_s": 0.126, "paths": {"map": "module_data_s07/map.html", "replay": "module_data_s07/simulation.html", "plot": "module_data_s07/path.svg", "geojson": "module_data_s07/track.geojson", "csv": "../../../../derived/datasets/tracks/module_data_s07_track.csv", "manifest": "module_data_s07/manifest.json"}}, {"flight_id": "triangle_15_01_2025", "source_file": "artifacts/triangle_15_01_2025.csv", "source_format": "module", "segment": "1/1", "gps_points": 9570, "sensor_rows": 956636, "duration_s": 956.93, "duration_label": "15:56.9", "distance_m": 2520.958678241016, "distance_label": "2521.0 m", "altitude_label": "54.3..96.4 m", "max_gap_s": 0.124, "paths": {"map": "triangle_15_01_2025/map.html", "replay": "triangle_15_01_2025/simulation.html", "plot": "triangle_15_01_2025/path.svg", "geojson": "triangle_15_01_2025/track.geojson", "csv": "../../../../derived/datasets/tracks/triangle_15_01_2025_track.csv", "manifest": "triangle_15_01_2025/manifest.json"}}];
+    const state = {
+      selectedId: flights[0]?.flight_id || "",
+      view: "map",
+      query: "",
+      format: "all",
+    };
+
+    const els = {
+      count: document.getElementById("count"),
+      search: document.getElementById("search"),
+      format: document.getElementById("format"),
+      list: document.getElementById("flightList"),
+      selectedName: document.getElementById("selectedName"),
+      selectedSource: document.getElementById("selectedSource"),
+      statDuration: document.getElementById("statDuration"),
+      statDistance: document.getElementById("statDistance"),
+      statPoints: document.getElementById("statPoints"),
+      statAltitude: document.getElementById("statAltitude"),
+      statSegment: document.getElementById("statSegment"),
+      viewer: document.getElementById("viewer"),
+      openLink: document.getElementById("openLink"),
+      empty: document.getElementById("empty"),
+      tabs: Array.from(document.querySelectorAll(".tabs button")),
+    };
+
+    function filteredFlights() {
+      const query = state.query.trim().toLowerCase();
+      return flights.filter((flight) => {
+        const matchesFormat = state.format === "all" || flight.source_format === state.format;
+        const haystack = `${flight.flight_id} ${flight.source_file}`.toLowerCase();
+        return matchesFormat && (!query || haystack.includes(query));
+      });
+    }
+
+    function chooseFallback(filtered) {
+      if (!filtered.length) return null;
+      return filtered.find((flight) => flight.flight_id === state.selectedId) || filtered[0];
+    }
+
+    function renderList(filtered, selected) {
+      els.list.innerHTML = "";
+      for (const flight of filtered) {
+        const button = document.createElement("button");
+        button.className = `flight${selected && flight.flight_id === selected.flight_id ? " active" : ""}`;
+        button.type = "button";
+        button.innerHTML = `
+          <div class="flight-title">
+            <span>${flight.flight_id}</span>
+            <span class="badge">${flight.source_format}</span>
+          </div>
+          <div class="flight-meta">
+            <span>${flight.duration_label}</span>
+            <span>${flight.distance_label}</span>
+            <span>${flight.gps_points} GPS</span>
+            <span>${flight.segment}</span>
+          </div>
+        `;
+        button.addEventListener("click", () => {
+          state.selectedId = flight.flight_id;
+          render();
+        });
+        els.list.appendChild(button);
+      }
+    }
+
+    function renderDetails(selected) {
+      if (!selected) {
+        els.empty.style.display = "block";
+        els.viewer.style.display = "none";
+        els.openLink.style.pointerEvents = "none";
+        els.selectedName.textContent = "Нет треков";
+        els.selectedSource.textContent = "";
+        for (const el of [els.statDuration, els.statDistance, els.statPoints, els.statAltitude, els.statSegment]) {
+          el.textContent = "";
+        }
+        return;
+      }
+      els.empty.style.display = "none";
+      els.viewer.style.display = "block";
+      els.openLink.style.pointerEvents = "auto";
+      els.selectedName.textContent = selected.flight_id;
+      els.selectedSource.textContent = selected.source_file;
+      els.statDuration.textContent = selected.duration_label;
+      els.statDistance.textContent = selected.distance_label;
+      els.statPoints.textContent = selected.gps_points;
+      els.statAltitude.textContent = selected.altitude_label;
+      els.statSegment.textContent = selected.segment;
+      const path = selected.paths[state.view];
+      els.viewer.src = path;
+      els.openLink.href = path;
+    }
+
+    function renderTabs() {
+      for (const tab of els.tabs) {
+        tab.classList.toggle("active", tab.dataset.view === state.view);
+      }
+    }
+
+    function render() {
+      const filtered = filteredFlights();
+      const selected = chooseFallback(filtered);
+      if (selected) state.selectedId = selected.flight_id;
+      els.count.textContent = `${filtered.length} из ${flights.length} треков`;
+      renderList(filtered, selected);
+      renderTabs();
+      renderDetails(selected);
+    }
+
+    els.search.addEventListener("input", (event) => {
+      state.query = event.target.value;
+      render();
+    });
+    els.format.addEventListener("change", (event) => {
+      state.format = event.target.value;
+      render();
+    });
+    for (const tab of els.tabs) {
+      tab.addEventListener("click", () => {
+        state.view = tab.dataset.view;
+        render();
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "source": {
+    "path": "artifacts/data.csv",
+    "name": "module_data",
+    "format": "module",
+    "type": "original_input"
+  },
+  "generated": {
+    "map_html": "artifacts/generated/gps_flights/module_data/map.html",
+    "simulation_html": "artifacts/generated/gps_flights/module_data/simulation.html",
+    "png": "artifacts/generated/gps_flights/module_data/path.png",
+    "svg": "artifacts/generated/gps_flights/module_data/path.svg",
+    "geojson": "artifacts/generated/gps_flights/module_data/track.geojson",
+    "manifest": "artifacts/generated/gps_flights/module_data/manifest.json"
+  },
+  "summary": {
+    "points": 23941,
+    "duration_s": 1064.919,
+    "distance_m": 2188979.7164242035,
+    "max_speed_mps": 150312.30134425405,
+    "median_speed_mps": 2012.393303290733,
+    "min_alt_m": 49.2,
+    "max_alt_m": 105.0,
+    "median_nsats": null,
+    "median_hdop": null,
+    "start_lat": 59.83619983333333,
+    "start_lon": 31.479122666666665,
+    "end_lat": 59.83616216666667,
+    "end_lon": 31.479015333333333,
+    "max_gap_s": 0.108,
+    "segments_by_gap_2s": 1
+  }
+}
