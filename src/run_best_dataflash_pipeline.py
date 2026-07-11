@@ -88,6 +88,16 @@ def parse_args() -> argparse.Namespace:
         default=Path("artifacts/generated/dataflash/predictions/sequence_fixed100_shrink/index.html"),
     )
     parser.add_argument("--demo-html", type=Path, default=Path("artifacts/generated/dataflash/demo/index.html"))
+    parser.add_argument(
+        "--state-diagnostics-report",
+        type=Path,
+        default=Path("reports/final/dataflash_state_diagnostics.md"),
+    )
+    parser.add_argument(
+        "--state-diagnostics-html",
+        type=Path,
+        default=Path("artifacts/generated/dataflash/diagnostics/index.html"),
+    )
     parser.add_argument("--final-html", type=Path, default=Path("artifacts/generated/dataflash/final_report/index.html"))
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
     return parser.parse_args()
@@ -215,6 +225,8 @@ def write_final_report(
     pred_dir: Path,
     sequence_report: Path,
     rollout_summary: Path,
+    state_diagnostics_report: Path,
+    state_diagnostics_html: Path,
     final_html: Path,
     local_metrics: dict[str, LocalMetrics],
     model_rollouts: dict[str, RolloutMetrics],
@@ -268,6 +280,8 @@ def write_final_report(
             "## Sparse Rollout Metrics",
             "",
             f"Rollout summary: `{rollout_summary}`",
+            f"State diagnostics report: `{state_diagnostics_report}`",
+            f"State diagnostics HTML: `{state_diagnostics_html}`",
             f"Final HTML dashboard: `{final_html}`",
             "",
             "| model | steps | final error m | mean error m | max error m |",
@@ -301,7 +315,9 @@ def write_final_report(
             "",
             f"- `{sequence_report}`",
             f"- `{rollout_summary}`",
+            f"- `{state_diagnostics_report}`",
             f"- `{path}`",
+            f"- `{state_diagnostics_html}`",
             f"- `{final_html}`",
         ]
     )
@@ -313,6 +329,7 @@ def write_final_html(
     prediction_viewer: Path,
     best_rollout_html: Path,
     demo_html: Path,
+    state_diagnostics_html: Path,
     local_metrics: dict[str, LocalMetrics],
     model_rollouts: dict[str, RolloutMetrics],
 ) -> None:
@@ -322,6 +339,7 @@ def write_final_html(
     pred_link = html.escape(os.path.relpath(prediction_viewer, start=path.parent).replace(os.sep, "/"))
     rollout_link = html.escape(os.path.relpath(best_rollout_html, start=path.parent).replace(os.sep, "/"))
     demo_link = html.escape(os.path.relpath(demo_html, start=path.parent).replace(os.sep, "/"))
+    diagnostics_link = html.escape(os.path.relpath(state_diagnostics_html, start=path.parent).replace(os.sep, "/"))
     rows_html = "\n".join(
         "<tr>"
         f"<td>{html.escape(MODEL_LABELS[model_name])}</td>"
@@ -426,6 +444,7 @@ def write_final_html(
       <p><a href="{pred_link}">Prediction viewer</a></p>
       <p><a href="{rollout_link}">Best rollout viewer</a></p>
       <p><a href="{demo_link}">Animated rollout demo</a></p>
+      <p><a href="{diagnostics_link}">State diagnostics</a></p>
     </section>
     <section>
       <h2>Model Comparison</h2>
@@ -508,6 +527,8 @@ def main() -> None:
         args.pred_dir,
         args.sequence_report,
         args.rollout_summary,
+        args.state_diagnostics_report,
+        args.state_diagnostics_html,
         args.final_html,
         local_metrics,
         model_rollouts,
@@ -521,11 +542,24 @@ def main() -> None:
         "--output",
         str(args.demo_html),
     )
+    run_step(
+        args.python,
+        "build_dataflash_state_diagnostics.py",
+        "--pred-csv",
+        str(case_dir / f"{BEST_MODEL}_pred.csv"),
+        "--rollout-csv",
+        str(args.rollout_dir / MODEL_ROLLOUT_NAMES[BEST_MODEL]),
+        "--report",
+        str(args.state_diagnostics_report),
+        "--html",
+        str(args.state_diagnostics_html),
+    )
     write_final_html(
         args.final_html,
         args.prediction_viewer,
         best_rollout_html,
         args.demo_html,
+        args.state_diagnostics_html,
         local_metrics,
         model_rollouts,
     )

@@ -40,6 +40,8 @@ Sequence report: `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100_
 ## Sparse Rollout Metrics
 
 Rollout summary: `reports/experiments/dataflash_rollout_summary.md`
+State diagnostics report: `reports/final/dataflash_state_diagnostics.md`
+State diagnostics HTML: `artifacts/generated/dataflash/diagnostics/index.html`
 Final HTML dashboard: `artifacts/generated/dataflash/final_report/index.html`
 
 | model | steps | final error m | mean error m | max error m |
@@ -68,6 +70,7 @@ Final HTML dashboard: `artifacts/generated/dataflash/final_report/index.html`
 
 - `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100_shrink.md`
 - `reports/experiments/dataflash_rollout_summary.md`
+- `reports/final/dataflash_state_diagnostics.md`
 - `reports/final/final_dataflash_report.md`
-- `artifacts/generated/dataflash/demo/index.html`
+- `artifacts/generated/dataflash/diagnostics/index.html`
 - `artifacts/generated/dataflash/final_report/index.html`

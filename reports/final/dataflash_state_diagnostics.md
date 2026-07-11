@@ -10,8 +10,8 @@ HTML: `artifacts/generated/dataflash/diagnostics/index.html`
 ## Overall
 
 - rows: 4344
-- rollout mean error: 91.872 m
-- rollout p95 error: 166.619 m
+- rollout mean error: 94.991 m
+- rollout p95 error: 167.399 m
 - local delta mean error: 13.990 m
 - local delta p95 error: 30.226 m
 
@@ -24,12 +24,12 @@ HTML: `artifacts/generated/dataflash/diagnostics/index.html`
 
 ## By State
 
-| state | rows | rollout mean | rollout p95 | rollout max | local mean | local p95 | abs vertical speed mean |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `hover` | 1124 | 97.701 | 158.295 | 179.040 | 13.355 | 26.146 | 0.069 |
-| `climb` | 357 | 66.144 | 135.655 | 148.075 | 10.928 | 20.597 | 1.627 |
-| `descent` | 920 | 62.635 | 121.738 | 132.671 | 11.575 | 20.125 | 0.819 |
-| `translate` | 1943 | 105.484 | 167.399 | 187.322 | 16.064 | 34.654 | 0.045 |
+| state | rows | rollout mean 3D | rollout p95 3D | rollout mean horiz | rollout p95 horiz | local mean 3D | local mean horiz | abs vertical speed mean |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `hover` | 1124 | 92.239 | 158.295 | 90.633 | 158.292 | 13.355 | 13.203 | 0.069 |
+| `climb` | 357 | 76.718 | 165.362 | 74.130 | 165.286 | 10.928 | 9.941 | 1.627 |
+| `descent` | 920 | 69.349 | 132.671 | 68.169 | 132.655 | 11.575 | 11.345 | 0.819 |
+| `translate` | 1943 | 112.081 | 182.549 | 110.745 | 182.534 | 16.064 | 16.004 | 0.045 |
 
 ## Notes
 

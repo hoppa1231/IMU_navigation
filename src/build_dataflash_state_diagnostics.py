@@ -102,6 +102,18 @@ def nearest_row(time_s: float, times: list[float], rows: list[dict[str, float]])
     return rows[best_index]
 
 
+def build_rollout_index(path: Path) -> dict[str, tuple[list[float], list[dict[str, str]]]]:
+    grouped_rows: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in read_rows(path):
+        grouped_rows[row.get("fold_id", "1")].append(row)
+    result: dict[str, tuple[list[float], list[dict[str, str]]]] = {}
+    for fold_id, rows in grouped_rows.items():
+        rows.sort(key=lambda item: as_float(item.get("time_s")))
+        times = [as_float(item.get("time_s")) for item in rows]
+        result[fold_id] = (times, rows)
+    return result
+
+
 def p95(values: list[float]) -> float:
     if not values:
         return math.nan
@@ -126,9 +138,7 @@ def classify_state(
 
 
 def build_diagnostics(args: argparse.Namespace) -> list[dict[str, float | str]]:
-    rollout_map: dict[tuple[str, str], dict[str, str]] = {}
-    for row in read_rows(args.rollout_csv):
-        rollout_map[(row.get("fold_id", "1"), row["time_s"])] = row
+    rollout_index = build_rollout_index(args.rollout_csv)
 
     baro_times, baro_rows = read_time_series(args.baro_csv, {"baro_climb_rate_mps": "CRt", "baro_alt_m": "Alt"})
     motor_times, motor_rows = read_time_series(
@@ -179,11 +189,14 @@ def build_diagnostics(args: argparse.Namespace) -> list[dict[str, float | str]]:
             vertical_emphasis_speed=args.vertical_emphasis_speed,
         )
 
-        rollout_row = rollout_map.get((fold_id, row["future_time_s"]), {})
+        rollout_times, rollout_rows = rollout_index.get(fold_id, ([], []))
+        rollout_row = nearest_row(future_time_s, rollout_times, rollout_rows) if rollout_times else {}
         rollout_err_3d = as_float(rollout_row.get("err_3d_m"))
         rollout_err_east = as_float(rollout_row.get("err_east_m"))
         rollout_err_north = as_float(rollout_row.get("err_north_m"))
         rollout_err_up = as_float(rollout_row.get("err_up_m"))
+        local_err_horizontal = math.hypot(local_err_east, local_err_north)
+        rollout_err_horizontal = math.hypot(rollout_err_east, rollout_err_north)
 
         baro = nearest_row(future_time_s, baro_times, baro_rows)
         motor = nearest_row(future_time_s, motor_times, motor_rows)
@@ -217,10 +230,12 @@ def build_diagnostics(args: argparse.Namespace) -> list[dict[str, float | str]]:
                 "local_err_north_m": local_err_north,
                 "local_err_up_m": local_err_up,
                 "local_err_3d_m": local_err_3d,
+                "local_err_horizontal_m": local_err_horizontal,
                 "rollout_err_east_m": rollout_err_east,
                 "rollout_err_north_m": rollout_err_north,
                 "rollout_err_up_m": rollout_err_up,
                 "rollout_err_3d_m": rollout_err_3d,
+                "rollout_err_horizontal_m": rollout_err_horizontal,
                 "baro_climb_rate_mps": float(baro.get("baro_climb_rate_mps", math.nan)),
                 "baro_alt_m": float(baro.get("baro_alt_m", math.nan)),
                 "motor_mean_norm": float(motor.get("motor_mean_norm", math.nan)),
@@ -242,15 +257,25 @@ def summarize(rows: list[dict[str, float | str]], key: str) -> dict[str, dict[st
     result: dict[str, dict[str, float]] = {}
     for name, group in grouped.items():
         rollout_errors = [float(row["rollout_err_3d_m"]) for row in group if math.isfinite(float(row["rollout_err_3d_m"]))]
+        rollout_horizontal_errors = [
+            float(row["rollout_err_horizontal_m"]) for row in group if math.isfinite(float(row["rollout_err_horizontal_m"]))
+        ]
         local_errors = [float(row["local_err_3d_m"]) for row in group if math.isfinite(float(row["local_err_3d_m"]))]
+        local_horizontal_errors = [
+            float(row["local_err_horizontal_m"]) for row in group if math.isfinite(float(row["local_err_horizontal_m"]))
+        ]
         vertical_speeds = [abs(float(row["vertical_speed_mps"])) for row in group if math.isfinite(float(row["vertical_speed_mps"]))]
         result[name] = {
             "count": float(len(group)),
             "rollout_mean": statistics.fmean(rollout_errors) if rollout_errors else math.nan,
             "rollout_p95": p95(rollout_errors),
             "rollout_max": max(rollout_errors) if rollout_errors else math.nan,
+            "rollout_horizontal_mean": statistics.fmean(rollout_horizontal_errors) if rollout_horizontal_errors else math.nan,
+            "rollout_horizontal_p95": p95(rollout_horizontal_errors),
             "local_mean": statistics.fmean(local_errors) if local_errors else math.nan,
             "local_p95": p95(local_errors),
+            "local_horizontal_mean": statistics.fmean(local_horizontal_errors) if local_horizontal_errors else math.nan,
+            "local_horizontal_p95": p95(local_horizontal_errors),
             "vertical_abs_mean": statistics.fmean(vertical_speeds) if vertical_speeds else math.nan,
         }
     return result
@@ -326,8 +351,8 @@ def write_report(path: Path, args: argparse.Namespace, payload: dict[str, object
             "",
             "## By State",
             "",
-            "| state | rows | rollout mean | rollout p95 | rollout max | local mean | local p95 | abs vertical speed mean |",
-            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            "| state | rows | rollout mean 3D | rollout p95 3D | rollout mean horiz | rollout p95 horiz | local mean 3D | local mean horiz | abs vertical speed mean |",
+            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
     for state in ("hover", "climb", "descent", "translate"):
@@ -336,7 +361,8 @@ def write_report(path: Path, args: argparse.Namespace, payload: dict[str, object
             continue
         lines.append(
             f"| `{state}` | {metrics['count']:.0f} | {metrics['rollout_mean']:.3f} | {metrics['rollout_p95']:.3f} | "
-            f"{metrics['rollout_max']:.3f} | {metrics['local_mean']:.3f} | {metrics['local_p95']:.3f} | "
+            f"{metrics['rollout_horizontal_mean']:.3f} | {metrics['rollout_horizontal_p95']:.3f} | "
+            f"{metrics['local_mean']:.3f} | {metrics['local_horizontal_mean']:.3f} | "
             f"{metrics['vertical_abs_mean']:.3f} |"
         )
     lines.extend(
