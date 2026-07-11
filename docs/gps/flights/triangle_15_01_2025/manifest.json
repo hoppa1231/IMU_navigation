@@ -1,0 +1,37 @@
+{
+  "source": {
+    "path": "artifacts/triangle_15_01_2025.csv",
+    "name": "triangle_15_01_2025",
+    "format": "module",
+    "type": "original_input"
+  },
+  "generated": {
+    "track_csv": "derived/datasets/tracks/triangle_15_01_2025_track.csv",
+    "map_html": "artifacts/generated/gps/flights/triangle_15_01_2025/map.html",
+    "simulation_html": "artifacts/generated/gps/flights/triangle_15_01_2025/simulation.html",
+    "path_svg": "artifacts/generated/gps/flights/triangle_15_01_2025/path.svg",
+    "track_geojson": "artifacts/generated/gps/flights/triangle_15_01_2025/track.geojson"
+  },
+  "segment": {
+    "index": 1,
+    "count": 1
+  },
+  "summary": {
+    "points": 9570,
+    "duration_s": 956.93,
+    "distance_m": 2520.958678241016,
+    "max_speed_mps": 33.46532837518177,
+    "median_speed_mps": 0.20535135354243358,
+    "min_alt_m": 54.3,
+    "max_alt_m": 96.4,
+    "median_nsats": null,
+    "median_hdop": null,
+    "start_lat": 59.8362615,
+    "start_lon": 31.479384666666668,
+    "end_lat": 59.836141833333336,
+    "end_lon": 31.4786645,
+    "max_gap_s": 0.124,
+    "segments_by_gap_2s": 1,
+    "source_segments": 1
+  }
+}

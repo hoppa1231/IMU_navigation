@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataFlash Final Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4f6f8;
+      color: #16202a;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f4f6f8;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+    section {
+      background: #ffffff;
+      border: 1px solid #d7dee8;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+    h1, h2 {
+      margin: 0 0 12px;
+      letter-spacing: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      border: 1px solid #e5e9ef;
+      border-radius: 6px;
+      padding: 12px;
+      background: #fafbfd;
+    }
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 4px;
+    }
+    a {
+      color: #0f62fe;
+      text-decoration: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid #e8edf3;
+    }
+    th {
+      font-weight: 650;
+      background: #fafbfd;
+    }
+    @media (max-width: 720px) {
+      body { padding: 12px; }
+      section { padding: 14px; }
+      table { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>DataFlash Final Candidate</h1>
+      <p>Best model: <code>sequence_ridge_bias_tuned</code> on <code>imu_att_h5000_l5000_s20</code> with fixed <code>alpha=100</code> and validation-tuned bias shrinkage.</p>
+      <div class="grid">
+        <div class="metric"><span>Local MAE 3D</span><strong>13.990 m</strong></div>
+        <div class="metric"><span>Local RMSE 3D</span><strong>16.353 m</strong></div>
+        <div class="metric"><span>Rollout Final</span><strong>52.818 m</strong></div>
+        <div class="metric"><span>Rollout Mean</span><strong>93.538 m</strong></div>
+        <div class="metric"><span>Rollout Max</span><strong>187.322 m</strong></div>
+      </div>
+    </section>
+    <section>
+      <h2>Viewers</h2>
+      <p><a href="../predictions/sequence_fixed100_shrink/index.html">Prediction viewer</a></p>
+      <p><a href="../rollouts/sequence_fixed100_shrink/index.html">Best rollout viewer</a></p>
+      <p><a href="../demo/index.html">Animated rollout demo</a></p>
+      <p><a href="../diagnostics/index.html">State diagnostics</a></p>
+    </section>
+    <section>
+      <h2>Model Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>model</th>
+            <th>MAE 3D</th>
+            <th>RMSE 3D</th>
+            <th>final error</th>
+            <th>mean error</th>
+            <th>max error</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>zero</td><td>16.251</td><td>24.523</td><td>205.592</td><td>103.972</td><td>287.038</td></tr>
+<tr><td>train_mean</td><td>16.305</td><td>24.374</td><td>206.091</td><td>97.513</td><td>237.277</td></tr>
+<tr><td>sequence_ridge_fixed_alpha_100</td><td>15.316</td><td>17.307</td><td>284.451</td><td>95.471</td><td>284.451</td></tr>
+<tr><td>sequence_ridge_fixed_alpha_100_bias_corrected</td><td>14.295</td><td>16.684</td><td>52.818</td><td>106.143</td><td>234.332</td></tr>
+<tr><td>sequence_ridge_fixed_alpha_100_bias_tuned</td><td>13.990</td><td>16.353</td><td>52.818</td><td>93.538</td><td>187.322</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
