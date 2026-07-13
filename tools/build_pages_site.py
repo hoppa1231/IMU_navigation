@@ -151,6 +151,7 @@ def build() -> None:
                 (
                     "DataFlash",
                     [
+                        ("Neural comparison", "dataflash/neural_demo/index.html"),
                         ("Demo", "dataflash/demo/index.html"),
                         ("Final report", "dataflash/final_report/index.html"),
                         ("Diagnostics", "dataflash/diagnostics/index.html"),
@@ -191,6 +192,7 @@ def build() -> None:
                 (
                     "Key pages",
                     [
+                        ("Neural comparison", "neural_demo/index.html"),
                         ("Demo", "demo/index.html"),
                         ("Final report", "final_report/index.html"),
                         ("Diagnostics", "diagnostics/index.html"),
@@ -199,6 +201,9 @@ def build() -> None:
                 (
                     "Rollouts",
                     [
+                        ("LSTM 64", "rollouts/lstm_64/index.html"),
+                        ("GRU 64", "rollouts/gru_64/index.html"),
+                        ("MLP 64", "rollouts/mlp_64/index.html"),
                         ("Zero baseline", "rollouts/zero/index.html"),
                         ("Train mean", "rollouts/train_mean/index.html"),
                         ("Ridge", "rollouts/ridge/index.html"),
