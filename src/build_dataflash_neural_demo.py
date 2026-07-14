@@ -10,6 +10,12 @@ from build_dataflash_demo import build_payload, html_template, read_rows
 
 
 DEFAULT_CASES = {
+    "LSTM purged IMU+ATT+CRt (seed 20260713)": Path(
+        "derived/predictions/dataflash_recurrent_rollout/lstm_64_imu_att_crt_purged.csv"
+    ),
+    "GRU purged IMU+ATT+CRt (seed 20260713)": Path(
+        "derived/predictions/dataflash_recurrent_rollout/gru_64_imu_att_crt_purged.csv"
+    ),
     "LSTM 64": Path("derived/predictions/dataflash_recurrent_rollout/lstm_64.csv"),
     "GRU 64": Path("derived/predictions/dataflash_recurrent_rollout/gru_64.csv"),
     "MLP 64": Path("derived/predictions/dataflash_neural_rollout/mlp_64.csv"),

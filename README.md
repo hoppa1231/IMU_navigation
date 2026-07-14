@@ -455,9 +455,33 @@ python3 src/run_dataflash_sequence_baseline.py \
   --pred-dir derived/predictions/dataflash_sequence_fixed100_shrink
 ```
 
-Это текущий лучший вариант: `sequence_ridge_bias_tuned` получил локальную `MAE 3D 13.990`, rollout final error `52.818 m`, mean rollout error `93.538 m`, max rollout error `187.322 m`. Для fold 2 shrink был выбран `0.5`, для folds 1 и 3 - `1.0`.
+На этом этапе лучшим линейным вариантом был `sequence_ridge_bias_tuned`: локальная `MAE 3D 13.990`, rollout final error `52.818 m`, mean rollout error `93.538 m`, max rollout error `187.322 m`. Для fold 2 shrink был выбран `0.5`, для folds 1 и 3 - `1.0`.
 
-Также проверен выбор shrink по validation rollout mean: `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100_shrink_rollout.md`. Он улучшил fold 1, но хуже защитил fold 2; текущим best остается выбор shrink по validation MAE.
+Также проверен выбор shrink по validation rollout mean: `reports/experiments/dataflash_sequence_imu_att_h5000_fixed100_shrink_rollout.md`. Он улучшил fold 1, но хуже защитил fold 2; среди этих линейных вариантов лучшим остался выбор shrink по validation MAE.
+
+### Recurrent-модели и purged validation
+
+После линейного baseline проверены MLP, GRU и LSTM без посткоррекции предсказаний. Затем оценка была ужесточена: между train, validation и test введен purge `10 s`, модели повторены на пяти seeds, а признаки проверены абляциями.
+
+```bash
+python3 src/run_dataflash_recurrent_robustness.py
+```
+
+Для запуска нужен TensorFlow и Python версии, поддерживаемой TensorFlow; рабочее проектное окружение на Python 3.14 для этого пока не подходит.
+
+Лучший результат дал `LSTM 64` на 19 каналах `IMU + ATT + BARO.CRt`, без абсолютной барометрической высоты, батареи и моторов:
+
+- локальная `MAE 3D`: `4.510 +/- 0.296 m`;
+- sparse rollout mean: `23.796 +/- 2.968 m`;
+- mean fold final error: `37.512 +/- 2.561 m`;
+- суммарная POS-дистанция трех test-блоков: `1335.5 m`;
+- mean fold final error per km: `81.4 +/- 7.7 m/km`.
+
+`GRU 64` на тех же признаках немного хуже: `MAE 4.665 +/- 0.190 m`, rollout mean `26.921 +/- 4.851 m`. Добавление абсолютной `BARO.Alt`, батареи и полного набора моторных каналов ухудшило перенос между временными блоками. Выбранный набор использует барометрическую скорость `CRt`, но не абсолютную высоту.
+
+Полный отчет: `reports/experiments/dataflash_recurrent_robustness.md`. Анимированное сравнение: `artifacts/generated/dataflash/neural_demo/index.html`.
+
+Ориентир `40 m на 3 km` не воспроизведен: текущая проверка покрывает другую дистанцию и дает существенно большую ошибку на километр. Линейно экстраполировать rollout до 3 km некорректно. Кроме того, все fold остаются участками одного DataFlash-полета; для вывода о переносе нужен независимый лог.
 
 Финальная сводка текущего DataFlash-кандидата:
 
