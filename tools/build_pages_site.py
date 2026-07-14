@@ -201,6 +201,8 @@ def build() -> None:
                 (
                     "Rollouts",
                     [
+                        ("LSTM purged IMU+ATT+CRt", "rollouts/lstm_64_imu_att_crt_purged/index.html"),
+                        ("GRU purged IMU+ATT+CRt", "rollouts/gru_64_imu_att_crt_purged/index.html"),
                         ("LSTM 64", "rollouts/lstm_64/index.html"),
                         ("GRU 64", "rollouts/gru_64/index.html"),
                         ("MLP 64", "rollouts/mlp_64/index.html"),
