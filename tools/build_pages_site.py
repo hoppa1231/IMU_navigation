@@ -130,6 +130,7 @@ def build() -> None:
 
     copy_tree(GENERATED / "dataflash", DOCS / "dataflash")
     copy_tree(GENERATED / "navigation", DOCS / "navigation")
+    copy_tree(GENERATED / "module_predictions", DOCS / "module_predictions")
 
     gps_dest = DOCS / "gps" / "flights"
     gps_dest.mkdir(parents=True, exist_ok=True)
@@ -137,6 +138,8 @@ def build() -> None:
         "dataflash_2025_01_15",
         "linear_15_01_2025",
         "triangle_15_01_2025",
+        "circle_07_02_2025",
+        "square_07_02_2025",
     ]
     for flight_id in selected_flights:
         copy_tree(GENERATED / "gps" / "flights" / flight_id, gps_dest / flight_id)
@@ -167,6 +170,7 @@ def build() -> None:
                         ("Trajectory overlay", "navigation/trajectory_overlay/index.html"),
                         ("IMU dead reckoning", "navigation/imu_dead_reckoning/index.html"),
                         ("POLI_NA rollout", "navigation/poli_na_rollout/index.html"),
+                        ("All module route predictions", "module_predictions/index.html"),
                     ],
                 ),
                 (
@@ -176,6 +180,8 @@ def build() -> None:
                         ("DataFlash flight map", "gps/flights/dataflash_2025_01_15/map.html"),
                         ("Linear flight replay", "gps/flights/linear_15_01_2025/simulation.html"),
                         ("Triangle flight replay", "gps/flights/triangle_15_01_2025/simulation.html"),
+                        ("Circle flight replay", "gps/flights/circle_07_02_2025/simulation.html"),
+                        ("Square flight replay", "gps/flights/square_07_02_2025/simulation.html"),
                     ],
                 ),
             ],
@@ -253,6 +259,10 @@ def build() -> None:
                         ("Linear map", "flights/linear_15_01_2025/map.html"),
                         ("Triangle replay", "flights/triangle_15_01_2025/simulation.html"),
                         ("Triangle map", "flights/triangle_15_01_2025/map.html"),
+                        ("Circle replay", "flights/circle_07_02_2025/simulation.html"),
+                        ("Circle map", "flights/circle_07_02_2025/map.html"),
+                        ("Square replay", "flights/square_07_02_2025/simulation.html"),
+                        ("Square map", "flights/square_07_02_2025/map.html"),
                     ],
                 ),
             ],

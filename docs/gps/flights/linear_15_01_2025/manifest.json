@@ -1,6 +1,6 @@
 {
   "source": {
-    "path": "artifacts/linear_15_01_2025.csv",
+    "path": "artifacts/initial/linear_15_01_2025.csv",
     "name": "linear_15_01_2025",
     "format": "module",
     "type": "original_input"

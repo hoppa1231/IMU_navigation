@@ -10,9 +10,9 @@ GPS/GNSS columns are excluded from input features. GPS tracks are used only to c
 
 | dataset | flights | windows | features | horizon | lookback | sensor sample | X shape | y shape |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| `windows_module_h1000_l1000` | 9 | 42613 | 168 | 1000 ms | 1000 ms | 20.0 ms | (42613, 168) | (42613, 3) |
-| `windows_module_h3000_l3000` | 9 | 42253 | 168 | 3000 ms | 3000 ms | 20.0 ms | (42253, 168) | (42253, 3) |
-| `windows_module_h5000_l5000` | 9 | 41894 | 168 | 5000 ms | 5000 ms | 20.0 ms | (41894, 168) | (41894, 3) |
+| `windows_module_h1000_l1000` | 11 | 54835 | 168 | 1000 ms | 1000 ms | 20.0 ms | (54835, 168) | (54835, 3) |
+| `windows_module_h3000_l3000` | 11 | 54395 | 168 | 3000 ms | 3000 ms | 20.0 ms | (54395, 168) | (54395, 3) |
+| `windows_module_h5000_l5000` | 11 | 53957 | 168 | 5000 ms | 5000 ms | 20.0 ms | (53957, 168) | (53957, 3) |
 
 ## Files
 

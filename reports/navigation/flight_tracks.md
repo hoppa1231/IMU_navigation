@@ -15,6 +15,7 @@ Original telemetry files are not modified.
 
 | flight_id | points | duration | distance | max gap | distance check | track csv | replay |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| `circle_07_02_2025` | 6689 | 11:08.8 | 3770.2 m | 0.118 s | 0.000000 m | `derived/datasets/tracks/circle_07_02_2025_track.csv` | `artifacts/generated/gps/flights/circle_07_02_2025/simulation.html` |
 | `dataflash_2025_01_15` | 4394 | 14:39.2 | 2449.4 m | 0.600 s | 0.000000 m | `derived/datasets/tracks/dataflash_2025_01_15_track.csv` | `artifacts/generated/gps/flights/dataflash_2025_01_15/simulation.html` |
 | `linear_15_01_2025` | 9274 | 15:27.3 | 2328.4 m | 0.123 s | 0.000000 m | `derived/datasets/tracks/linear_15_01_2025_track.csv` | `artifacts/generated/gps/flights/linear_15_01_2025/simulation.html` |
 | `module_data_s01` | 1675 | 02:47.4 | 31.0 m | 0.126 s | 0.000000 m | `derived/datasets/tracks/module_data_s01_track.csv` | `artifacts/generated/gps/flights/module_data_s01/simulation.html` |
@@ -24,6 +25,7 @@ Original telemetry files are not modified.
 | `module_data_s05` | 387 | 00:38.5 | 4.4 m | 0.148 s | 0.000000 m | `derived/datasets/tracks/module_data_s05_track.csv` | `artifacts/generated/gps/flights/module_data_s05/simulation.html` |
 | `module_data_s06` | 10653 | 17:44.9 | 1120.0 m | 0.134 s | 0.000000 m | `derived/datasets/tracks/module_data_s06_track.csv` | `artifacts/generated/gps/flights/module_data_s06/simulation.html` |
 | `module_data_s07` | 5641 | 09:24.0 | 1827.1 m | 0.126 s | 0.000000 m | `derived/datasets/tracks/module_data_s07_track.csv` | `artifacts/generated/gps/flights/module_data_s07/simulation.html` |
+| `square_07_02_2025` | 5570 | 09:16.9 | 3163.0 m | 0.123 s | 0.000000 m | `derived/datasets/tracks/square_07_02_2025_track.csv` | `artifacts/generated/gps/flights/square_07_02_2025/simulation.html` |
 | `triangle_15_01_2025` | 9570 | 15:56.9 | 2521.0 m | 0.124 s | 0.000000 m | `derived/datasets/tracks/triangle_15_01_2025_track.csv` | `artifacts/generated/gps/flights/triangle_15_01_2025/simulation.html` |
 
 ## Notes

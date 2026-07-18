@@ -397,39 +397,40 @@ def main() -> None:
         raise ValueError(f"No {args.source_format} records found in {args.flight_index}")
 
     source_cache: dict[Path, tuple[list[str], list[SegmentBounds]]] = {}
-    sensor_cache: dict[tuple[str, int], SensorSeries] = {}
     tracks: dict[str, Track] = {}
     for record in records:
         source_path = Path(record["source_file"])
         if source_path not in source_cache:
             source_cache[source_path] = source_segment_bounds(source_path, args.max_gap_s, args.max_jump_m)
+        tracks[record["flight_id"]] = read_track(args.tracks_dir / f"{record['flight_id']}_track.csv")
+
+    # A full mission contains millions of module samples.  Read one flight at
+    # a time and immediately distribute its windows to all requested configs;
+    # retaining every SensorSeries at once needlessly exhausts memory.
+    base_feature_names: list[str] | None = None
+    feature_names: list[str] | None = None
+    config_parts: dict[tuple[int, int], tuple[list[np.ndarray], list[np.ndarray], list[dict[str, str]]]] = {
+        config: ([], [], []) for config in configs
+    }
+    for record in records:
+        flight_id = record["flight_id"]
+        source_path = Path(record["source_file"])
         fieldnames, bounds = source_cache[source_path]
         segment_index = int(record["segment_index"]) - 1
         if segment_index < 0 or segment_index >= len(bounds):
-            raise ValueError(f"{record['flight_id']}: segment index is out of range")
-        sensor_cache[(record["flight_id"], segment_index)] = read_sensor_segment(
+            raise ValueError(f"{flight_id}: segment index is out of range")
+        sensor = read_sensor_segment(
             source_path,
             bounds[segment_index],
             fieldnames,
             args.sensor_sample_ms,
         )
-        tracks[record["flight_id"]] = read_track(args.tracks_dir / f"{record['flight_id']}_track.csv")
-
-    first_sensor = next(iter(sensor_cache.values()))
-    base_feature_names = first_sensor.feature_names
-    feature_names = expanded_feature_names(base_feature_names)
-    summary_rows: list[dict[str, object]] = []
-
-    for horizon_ms, lookback_ms in configs:
-        x_parts: list[np.ndarray] = []
-        y_parts: list[np.ndarray] = []
-        meta_rows: list[dict[str, str]] = []
-
-        for record in records:
-            flight_id = record["flight_id"]
-            sensor = sensor_cache[(flight_id, int(record["segment_index"]) - 1)]
-            if sensor.feature_names != base_feature_names:
-                raise ValueError(f"{flight_id}: feature schema differs from first module flight")
+        if base_feature_names is None:
+            base_feature_names = sensor.feature_names
+            feature_names = expanded_feature_names(base_feature_names)
+        elif sensor.feature_names != base_feature_names:
+            raise ValueError(f"{flight_id}: feature schema differs from first module flight")
+        for horizon_ms, lookback_ms in configs:
             x_flight, y_flight, meta_flight = build_windows_for_flight(
                 flight_id,
                 tracks[flight_id],
@@ -438,11 +439,18 @@ def main() -> None:
                 lookback_ms,
                 args.max_windows_per_flight,
             )
-            if len(meta_flight) == 0:
-                continue
-            x_parts.append(x_flight)
-            y_parts.append(y_flight)
-            meta_rows.extend(meta_flight)
+            if meta_flight:
+                x_parts, y_parts, meta_rows = config_parts[(horizon_ms, lookback_ms)]
+                x_parts.append(x_flight)
+                y_parts.append(y_flight)
+                meta_rows.extend(meta_flight)
+
+    if base_feature_names is None or feature_names is None:
+        raise ValueError("No sensor features were read")
+    summary_rows: list[dict[str, object]] = []
+
+    for horizon_ms, lookback_ms in configs:
+        x_parts, y_parts, meta_rows = config_parts[(horizon_ms, lookback_ms)]
 
         if not x_parts:
             raise ValueError(f"No windows created for horizon={horizon_ms}, lookback={lookback_ms}")

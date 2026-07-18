@@ -53,6 +53,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pred-dir", type=Path, default=Path("derived/predictions/module_window_baselines"))
     parser.add_argument("--max-train-windows", type=int, default=0)
     parser.add_argument("--target-mode", choices=["xyz", "xy"], default="xyz")
+    parser.add_argument(
+        "--all-route-holdouts-only",
+        action="store_true",
+        help="Run only the leave-one-route-out splits generated for every available module flight.",
+    )
+    parser.add_argument("--holdout-flight", type=str, default=None, help="Run only the named all-route holdout flight.")
     return parser.parse_args()
 
 
@@ -126,6 +132,34 @@ def default_splits(flights: set[str]) -> list[Split]:
         test = [flight for flight in split.test if flight in flights]
         if train and len(val) == len(split.val) and len(test) == len(split.test):
             valid.append(Split(name=split.name, train=train, val=val, test=test))
+
+    # Produce an out-of-flight prediction for every module route that is
+    # available in the dataset.  This keeps the held-out route completely out
+    # of training; the validation route is also excluded from training so the
+    # regularisation choice does not inspect the test route.
+    module_flights = sorted(flight for flight in flights if flight != "dataflash_2025_01_15")
+    preferred_validation = "module_data_s07"
+    for test_flight in module_flights:
+        validation_flight = preferred_validation if test_flight != preferred_validation else "module_data_s06"
+        if validation_flight not in flights or validation_flight == test_flight:
+            alternatives = [flight for flight in module_flights if flight != test_flight]
+            if not alternatives:
+                continue
+            validation_flight = alternatives[0]
+        train_flights = [
+            flight
+            for flight in module_flights
+            if flight not in {test_flight, validation_flight}
+        ]
+        if train_flights:
+            valid.append(
+                Split(
+                    name=f"all_routes_holdout_{test_flight}",
+                    train=train_flights,
+                    val=[validation_flight],
+                    test=[test_flight],
+                )
+            )
     return valid
 
 
@@ -418,6 +452,11 @@ def main() -> None:
     feature_sections: dict[str, list[tuple[str, float]]] = {}
     for dataset in datasets:
         splits = default_splits(set(dataset.flight_id.tolist()))
+        if args.all_route_holdouts_only:
+            splits = [split for split in splits if split.name.startswith("all_routes_holdout_")]
+        if args.holdout_flight:
+            expected_name = f"all_routes_holdout_{args.holdout_flight}"
+            splits = [split for split in splits if split.name == expected_name]
         if not splits:
             raise ValueError(f"No default splits apply to {dataset.name}")
         for split in splits:
