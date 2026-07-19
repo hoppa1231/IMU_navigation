@@ -14,6 +14,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pred-dir", type=Path, default=Path("derived/predictions/module_window_baselines_all_routes"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/generated/module_predictions/index.html"))
+    parser.add_argument("--models", nargs="+", default=["ridge"], help="Prediction model stems, without `_pred.csv`.")
     return parser.parse_args()
 
 
@@ -49,7 +50,7 @@ def read_case(path: Path) -> dict[str, object] | None:
         points.append({"te": truth_e, "tn": truth_n, "pe": pred_e, "pn": pred_n})
     return {
         "id": str(path.parent.parent.name + "/" + path.parent.name),
-        "label": f"{rows[0]['flight_id']} — {path.parent.parent.name}",
+        "label": f"{rows[0]['flight_id']} — {path.parent.parent.name} / {path.stem.removesuffix('_pred')}",
         "steps": len(selected),
         "finalError": errors[-1],
         "meanError": sum(errors) / len(errors),
@@ -59,11 +60,10 @@ def read_case(path: Path) -> dict[str, object] | None:
 
 def main() -> None:
     args = parse_args()
-    cases = [
-        case
-        for path in sorted(args.pred_dir.glob("*/all_routes_holdout_*/ridge_pred.csv"))
-        if (case := read_case(path))
-    ]
+    paths = [path for model in args.models for path in args.pred_dir.glob(f"*/route_holdout_*/{model}_pred.csv")]
+    if args.models == ["ridge"]:
+        paths = list(args.pred_dir.glob("*/all_routes_holdout_*/ridge_pred.csv"))
+    cases = [case for path in sorted(paths) if (case := read_case(path))]
     if not cases:
         raise ValueError(f"No ridge predictions found under {args.pred_dir}")
     payload = json.dumps(cases, ensure_ascii=False)

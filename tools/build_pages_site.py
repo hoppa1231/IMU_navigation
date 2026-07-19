@@ -131,6 +131,7 @@ def build() -> None:
     copy_tree(GENERATED / "dataflash", DOCS / "dataflash")
     copy_tree(GENERATED / "navigation", DOCS / "navigation")
     copy_tree(GENERATED / "module_predictions", DOCS / "module_predictions")
+    copy_tree(GENERATED / "module_recurrent", DOCS / "module_recurrent")
 
     gps_dest = DOCS / "gps" / "flights"
     gps_dest.mkdir(parents=True, exist_ok=True)
@@ -171,6 +172,7 @@ def build() -> None:
                         ("IMU dead reckoning", "navigation/imu_dead_reckoning/index.html"),
                         ("POLI_NA rollout", "navigation/poli_na_rollout/index.html"),
                         ("All module route predictions", "module_predictions/index.html"),
+                        ("GRU/LSTM route holdouts", "module_recurrent/index.html"),
                     ],
                 ),
                 (
