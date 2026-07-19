@@ -9,13 +9,13 @@ GRU and LSTM were trained on chronological sequences of module sensor features a
 - square GRU: 20 time steps, 6,000 train sequences, early stopping;
 - square LSTM: a short 10-step / 1,000-sequence run to fit the available CPU execution budget.
 
-| test route | model | sequence length | train sequences | epochs | MAE 3D m | RMSE 3D m | P95 3D m |
+| test route | model | sequence length | train sequences | epochs | local MAE 3D m | rollout final horizontal m | rollout mean horizontal m |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `circle_07_02_2025` | GRU 64 | 20 | 6,000 | 7 | 5.860 | 7.502 | 15.714 |
-| `circle_07_02_2025` | LSTM 64 | 20 | 6,000 | 6 | 5.704 | 7.570 | 16.785 |
-| `square_07_02_2025` | GRU 64 | 20 | 6,000 | 8 | 3.573 | 4.765 | 11.051 |
-| `square_07_02_2025` | LSTM 64 | 10 | 1,000 | 1 | 6.000 | 7.448 | 11.269 |
+| `circle_07_02_2025` | GRU 64 | 20 | 6,000 | 7 | 5.860 | 1086.794 | 466.887 |
+| `circle_07_02_2025` | LSTM 64 | 20 | 6,000 | 6 | 5.704 | 1570.739 | 689.906 |
+| `square_07_02_2025` | GRU 64 | 20 | 6,000 | 8 | 3.573 | 363.698 | 207.659 |
+| `square_07_02_2025` | LSTM 64 | 10 | 1,000 | 1 | 6.000 | 250.950 | 401.027 |
 
 ## Comparison with the previous ridge baseline
 
-At the same 1-second horizon, ridge had MAE 3D `6.079 m` on circle and `5.827 m` on square. The GRU improves both held-out routes, especially square. The short LSTM run is a valid execution check but not yet a tuned comparison; it needs a longer CPU/GPU run before model selection.
+At the same 1-second horizon, ridge had local MAE 3D `6.079 m` on circle and `5.827 m` on square. GRU improves that **local** metric, but the accumulated rollout drifts by hundreds of metres to more than a kilometre. Therefore neither GRU nor LSTM is a usable GNSS-free navigation candidate on these route holdouts. The short LSTM run is only an execution check, not a model-selection result.
